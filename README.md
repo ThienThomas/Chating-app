@@ -6,7 +6,7 @@ This project is about programing Android application bases on some high-quality,
 
 Please check back soon, we're still sitting on the moon !
 
-Dependencies in the Project: 
+## Dependencies in the Project: 
 - @react-native-masked-view/masked-view: 0.2.6
 - @react-navigation/material-top-tabs: ^6.0.6,
 - @react-navigation/native: ^6.0.6",
@@ -33,6 +33,6 @@ Dependencies in the Project:
 -  react-native-safe-area-context: 3.3.2,
 -  react-native-screens: ~3.10.1,
 -  react-native-tab-view: ^3.1.1,
--  react-native-web: "0.17.7"
+-  react-native-web: 0.17.7
 
 
