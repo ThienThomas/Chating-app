@@ -49,18 +49,13 @@ function App() {
         }, 
           headerTintColor: 'white',
         }}>
-          {!currUser.displayName &&
+          {!currUser.displayName && (
             <Stack.Screen 
               name='profile' 
               component={Profile} 
               options={{headerShown: false, title: "Profile"}}
               />
-          }
-          <Stack.Screen 
-            name="home"
-            options={{title: "Chats"}} 
-            component={Home}
-          />
+          )}
         </Stack.Navigator>
         )  
       }
