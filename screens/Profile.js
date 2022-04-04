@@ -10,8 +10,9 @@ import { uploadImage } from "../utils";
 import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytes, ref } from "firebase/storage";
+import { cacheImages, _loadAssetsAsync } from "../AssetsCaching";
 
-export default function Profile(){
+export default function Profile({navigation}){
     const [displayName, setDisplayName] = useState("")
     const [selectedImage, setSelectedImage] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
@@ -64,20 +65,24 @@ export default function Profile(){
             `avatars/${user.email}`,
             "profilePicture"
           );
-          photoURL = url;
+          photoURL = [url];
+          _loadAssetsAsync(photoURL);
+
         }
         const userData = {
           displayName,
           email: user.email,
         };
         if (photoURL) {
-          userData.photoURL = photoURL;
+          userData.photoURL = photoURL[0];
         }
-        
+     
         await Promise.all([
           updateProfile(user, userData),
           setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
         ]);
+        
+        navigation.navigate('home')
       }
 
     return (

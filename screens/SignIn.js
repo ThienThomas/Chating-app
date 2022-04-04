@@ -4,6 +4,7 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { Button } from "react-native-web";
 import ConText from "../context/ConText"
 import {signUp, signIn} from '../firebase'
+import Splash from "./Splash";
 const styles = StyleSheet.create({
     txt_input: {
         color: 'black',
@@ -16,6 +17,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 0.5,
         borderColor: '#D1D1D1',
     },
+    
     button: {
         borderRadius: 15,
         marginTop: 10,
@@ -54,11 +56,11 @@ const styles = StyleSheet.create({
         color: "#FF5757"
     }
 });
-export default function SignIn() {
+export default function SignIn({navigation}) {
     const [email, setEmail] =  useState("")
     const [password, setPassword] = useState("")
     const [passwordagain, setPasswordagain] = useState("")
-    const [mode, setMode] = useState("signUp")
+    const [mode, setMode] = useState("signIn")
     const {
         theme: {colors},
     } = useContext(ConText)
@@ -75,7 +77,7 @@ export default function SignIn() {
             justifyContent: "center", 
             alignItems: "center", 
             flex: 1, 
-            backgroundColor: colors.white}
+            backgroundColor: 'white'}
             }>
             <Image 
             source={require('../assets/welcome-img.png')}
@@ -125,7 +127,7 @@ export default function SignIn() {
                             }}
                              onPress={
                                  () => mode === "signUp" ? setMode("signIn") : setMode("signUp")}
-                        >
+                            >
                             <Text
                                 style={{textAlign: "center", marginTop: 10, color: "#42C2FF"}}
                             >
@@ -133,6 +135,18 @@ export default function SignIn() {
                                     mode === "signUp" ? 
                                     "Đã có tài khoản ? Đăng nhập !" :  "Chưa có tài khoản ? Đăng ký"
                                 }
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                             onPress={() => {navigation.navigate("forgot")}}
+                            >
+                            <Text
+                                style={{textAlign: "center", marginTop: 10, color: "#42C2FF"}}
+                            >
+                                Quên mật khẩu
                             </Text>
                         </TouchableOpacity>
                 </View>
