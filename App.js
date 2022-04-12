@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, LogBox } from 'react-native';
 import { useAssets } from "expo-asset";
 import { onAuthStateChanged} from "firebase/auth"
 import { auth } from "./firebase"
-import { NavigationContainer} from "@react-navigation/native"
+import { NavigationContainer, useNavigation} from "@react-navigation/native"
 import { createStackNavigator}  from "@react-navigation/stack"
 import SignIn from "./screens/SignIn"
 import ContextWrapper from './context/ConTextWrapper';
@@ -13,6 +13,7 @@ import { async } from '@firebase/util';
 import AppLoading from 'expo-app-loading';
 import { render } from 'react-dom';
 import Context from './context/ConText';
+import Settings from './screens/Settings';
 import Profile from './screens/Profile'
 import Splash from './screens/Splash'
 import TextGradient from './elements/TextGradient';
@@ -32,6 +33,7 @@ import Avatar from './elements/Avatar';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import BottomTabNavigatorElement from './elements/BottomTabbarElements';
+
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 LogBox.ignoreLogs([
@@ -40,7 +42,8 @@ LogBox.ignoreLogs([
 ])
 import UserInfo from './screens/UserInfo';
 import PointPropType from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedPointPropType';
-import ChangeInfo from './screens/ChangeUserInfo';
+import ChangeInfo from './screens/Settings';
+
 function App() {
   const [currUser, setCurrUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -50,10 +53,12 @@ function App() {
       if (user) {
         setCurrUser(user);
       }
+      else {
+        setCurrUser(null);
+      }
     });
     return () => unsubscribe;
   }, []);
-
   if (loading) {
     return (
       <View style={{
@@ -72,65 +77,80 @@ function App() {
   }
   return (
     <NavigationContainer>
-      <StatusBar style='transparent'></StatusBar>
-      {!currUser ? (
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-            <Stack.Screen name='intro' component={Intro}/>
-            <Stack.Screen name='signIn' component={SignIn} />
-            <Stack.Screen name='forgot' component={Forgot} />
-        </Stack.Navigator>
-      ) : (
-        
-        <Stack.Navigator screenOptions={{headerStyle: {
-          backgroundColor: 'white',
-          shadowOpacity: 0,
-          elevation: 0}, 
-          headerTintColor: 'white',
-        }}>
-          <Stack.Group>
-          {!currUser.displayName && (
-            <Stack.Screen 
-              name='profile' 
-              component={Profile} 
-              options={{headerShown: false, title: "Profile"}}
-              />
-              )}
-              <Stack.Screen 
-              name='home' 
-              component={Home} 
-              options={{headerShown: false, title: "home"}}
-              />
-              </Stack.Group>
-              <Stack.Group screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'} }}> 
-                <Stack.Screen 
-                  name="userinfo" 
-                  component={UserInfo} 
-                  options={{
-                    headerBackTitle: <Feather name="chevron-left" size={45} color="#1590C4" />,
-                    headerBackTitleVisible: true,
-                    headerBackTitleStyle: {
-                      color: 'black'
-                    },
-                    headerBackImage: () => {""},
-                    headerRight: () => { return (
-                        <Feather name="edit" size={30} color="#1590C4" style={{marginRight: 20}}/>
-                    )},
-                    
-                    
-                  }}
-                  />
-                  <Stack.Screen
-                    name='changeinfo'
-                    component={ChangeInfo} 
-                   />
-              </Stack.Group>
-        </Stack.Navigator>
-        )  
+    <StatusBar style='transparent'></StatusBar>
+    <Stack.Navigator screenOptions={{headerStyle: {
+        backgroundColor: 'white',
+        shadowOpacity: 0,
+        elevation: 0}, 
+        headerTintColor: 'white',
       }
-    </NavigationContainer>
+    }
+      >
+    {!currUser ? (
+      <Stack.Group screenOptions={{headerShown: false}}>
+          <Stack.Screen name='intro' component={Intro}/>
+          <Stack.Screen name='signIn' component={SignIn} />
+          <Stack.Screen name='forgot' component={Forgot} />
+      </Stack.Group>
+    ) : (
+        <>
+        <Stack.Group>
+        {!currUser.displayName && (
+          <Stack.Screen 
+            name='profile' 
+            component={Profile} 
+            options={{headerShown: false, title: "Profile"}}
+            />
+            )}
+            <Stack.Screen 
+            name='home' 
+            component={Home} 
+            options={{headerShown: false, title: "home"}}
+            />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'} }}> 
+              <Stack.Screen 
+                name="userinfo" 
+                component={UserInfo} 
+                options={{/*
+                  headerBackTitle: <Feather name="chevron-left" size={45} color="#1590C4" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  headerRight: () => { return (
+                      <Feather name="edit" size={30} color="#1590C4" style={{marginRight: 20}}/>
+                  )},*/
+                }}
+                />
+                
+            </Stack.Group>
+            <Stack.Group>
+            <Stack.Screen screenOptions={{presentation: 'modal',  headerTitleStyle:{color: 'transparent'} }}
+                  name='settings'
+                  component={Settings} 
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                                      headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  
+                  }}
+                  
+                 />
+            </Stack.Group>
+            </>
+      )  
+    }
+    </Stack.Navigator>
+  </NavigationContainer>
   );
 }
 function Home(){
+  const navigation = useNavigation();
   return (
       <Tab.Navigator
           screenOptions={{
@@ -158,8 +178,11 @@ function Home(){
               height: 80
             },
             headerLeft: props => (
-              <Avatar />
+              <TouchableOpacity onPress={() => {navigation.navigate('userinfo')}} style={{marginLeft: 15}}>
+                <Avatar />
+                </TouchableOpacity>
             ),
+            
         }
       }
       >

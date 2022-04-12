@@ -46,7 +46,7 @@ const palette = {
     lightGray: "#757575",
     iconGray: "#717171",
   };
-  
+
   export const theme = {
     colors: {
       background: palette.smokeWhite,

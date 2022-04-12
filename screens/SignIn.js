@@ -1,10 +1,15 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Text, View, Image, StyleSheet, Pressable, Dimensions} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { Button } from "react-native-web";
+import { Button, Keyboard } from "react-native";
 import ConText from "../context/ConText"
-import {signUp, signIn} from '../firebase'
+import {signUp, signIn, auth} from '../firebase'
 import Splash from "./Splash";
+import { useNavigation } from "@react-navigation/native";
+import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import {GlobalContext, UseGlobalContext} from "../GlobalContext";
+import { Alert } from "react-native";
+
 const styles = StyleSheet.create({
     txt_input: {
         color: 'black',
@@ -56,23 +61,45 @@ const styles = StyleSheet.create({
         color: "#FF5757"
     }
 });
-export default function SignIn({navigation}) {
+export default function SignIn() {
+    return (
+        <UseGlobalContext>
+            <Form />
+        </UseGlobalContext>
+    )
+}
+function Form() {
     const [email, setEmail] =  useState("")
     const [password, setPassword] = useState("")
     const [passwordagain, setPasswordagain] = useState("")
     const [mode, setMode] = useState("signIn")
+
     const {
         theme: {colors},
     } = useContext(ConText)
+
+    const navigation = useNavigation();
+    const globalContext = useContext(GlobalContext);
     async function handlePress(){
+        Keyboard.dismiss()
+        globalContext.setIsPending(true)
         if (mode === "signUp"){
-            await signUp(email, password, passwordagain)
+           await signUp(email, password, passwordagain)
         }
         if (mode === "signIn"){
             await signIn(email, password)
+            if (!auth.currentUser){
+                Alert.alert('Có lỗi xảy ra', 'Bạn vui lòng kiểm tra lại mật khẩu hoặc kết nối mạng và thử lại !', [
+                    { text: 'OK', onPress: () => console.log('OK Pressed') },
+                  ]);
+            }
         }
+        globalContext.setIsPending(false)
+        
     }
+    
     return (
+        <>
         <View style={{
             justifyContent: "center", 
             alignItems: "center", 
@@ -152,5 +179,7 @@ export default function SignIn({navigation}) {
                 </View>
              </View>
         </View>
+        {!globalContext.isPending ?  null : <AppLoadingAnimation />}
+        </>
     )
 }

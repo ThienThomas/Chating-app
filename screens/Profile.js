@@ -1,23 +1,36 @@
 import React, { useEffect, useState, useContext  } from "react";
-import { View, Text, StatusBar, Dimensions, Pressable, Image, Modal, StyleSheet, PermissionsAndroid} from "react-native";
+import { View, Text, StatusBar, Dimensions, Pressable, Image, Modal, StyleSheet, PermissionsAndroid, Alert} from "react-native";
 import { Constants } from "expo-constants";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import {FontAwesome, MaterialCommunityIcons, Fontisto, Ionicons, Entypo } from "@expo/vector-icons"
 import { setSelectedLog } from "react-native/Libraries/LogBox/Data/LogBoxData";
 import * as ImagePicker from 'expo-image-picker'
-import { auth, db, storage} from '../firebase'
+import { app, auth, db, storage} from '../firebase'
 import { uploadImage } from "../utils";
 import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { getDownloadURL, uploadBytes, ref } from "firebase/storage";
+import { getDownloadURL, uploadBytes} from "firebase/storage";
 import { cacheImages, _loadAssetsAsync } from "../AssetsCaching";
-
-export default function Profile({navigation}){
+import { getDatabase, ref,  onValue, set } from "firebase/database";
+import { async } from "@firebase/util";
+import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { useNavigation } from "@react-navigation/native";
+import { GlobalContext, UseGlobalContext } from "../GlobalContext";
+export default function Profile(){
+    return (
+        <UseGlobalContext>
+            <MyProfile />
+        </UseGlobalContext>
+    )
+}
+function MyProfile(){
     const [displayName, setDisplayName] = useState("")
     const [selectedImage, setSelectedImage] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
     const [hasCameraPermission, setHasCameraPermission] = useState(null)
     const [hasGalleryPermission, setHasGalleryPermission] = useState(null)
+    const navigation = useNavigation();
+    const globalContext = useContext(GlobalContext);
     async function requestCameraPermission(){
         try {
             const granted = await PermissionsAndroid.requestMultiple(
@@ -56,7 +69,21 @@ export default function Profile({navigation}){
         }
         else requestCameraPermission();
     }
+    async function uploadDatabase(Uid, Name, Email, PhotoURL){
+        const rdb = getDatabase();
+        const reference = ref(rdb, "users/" + Uid)
+        set(reference, {
+            uid: Uid,
+            name: Name,
+            email: Email,
+            photo: !PhotoURL ? "none" : PhotoURL,
+            
+        }).catch((error) => {
+            alert("Có lỗi xảy ra, vui lòng thử lại")
+        })
+    }
     async function handlePress() {
+        globalContext.setIsPending(true);
         const user = auth.currentUser;
         let photoURL;
         if (selectedImage) {
@@ -76,16 +103,24 @@ export default function Profile({navigation}){
         if (photoURL) {
           userData.photoURL = photoURL[0];
         }
-     
+        
         await Promise.all([
           updateProfile(user, userData),
-          setDoc(doc(db, "users", user.uid), { ...userData, uid: user.uid }),
+          setDoc(doc(db, "users", user.uid), { ...userData,
+            uid: user.uid, 
+            listfriends: [],
+            sendRequest: [],
+            receivedRequest: [],
+            spams: [],
+            blocks: [],
+            }),
         ]);
-        
-        navigation.navigate('home')
+        globalContext.setIsPending(false);
+        navigation.replace('home')
       }
 
     return (
+        <>
         <React.Fragment>
             <StatusBar style="auto" />
             <View style={{
@@ -179,6 +214,8 @@ export default function Profile({navigation}){
                 </View>
             </View>
         </React.Fragment>
+        {!globalContext.isPending ?  null : <AppLoadingAnimation />}
+        </>
     )
 }
 const styles = StyleSheet.create({

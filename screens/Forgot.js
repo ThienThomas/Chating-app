@@ -10,7 +10,12 @@ import { auth } from '../firebase';
 import { Modal } from "react-native";
 import {FontAwesome, MaterialCommunityIcons, Fontisto, Ionicons, Entypo } from "@expo/vector-icons"
 import { render } from "react-dom";
-
+import { useNavigation } from "@react-navigation/native";
+import { GlobalContext, UseGlobalContext } from "../GlobalContext";
+import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { Alert } from "react-native";
+import { async } from "@firebase/util";
+import { Keyboard } from "react-native";
 const styles = StyleSheet.create({
     txt_input: {
         color: 'black',
@@ -116,7 +121,14 @@ const styles = StyleSheet.create({
         margin: 0
     },
 });
-export default function Forgot({navigation}) {
+export default function Forgot(){
+    return (
+        <UseGlobalContext>
+            <MyForgot />
+        </UseGlobalContext>
+    )
+}
+function MyForgot() {
     const [email, setEmail] =  useState("")
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState("");
@@ -124,43 +136,35 @@ export default function Forgot({navigation}) {
     const {
         theme: {colors},
     } = useContext(ConText)
-
-    function routingModal(){
-        if (modalStatus === 1){
-            setModalVisible(false);
-            setTimeout(()=>{
-                navigation.goBack('signIn');
-            }, 1000)
-            
-        }
-        else {
-            setModalVisible(false);
-        }
-    }
-    const resetPassword = () =>{
+    const navigation = useNavigation()
+    const globalContext = useContext(GlobalContext)
+    async function resetPassword() {
         let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
+        Keyboard.dismiss()
+        globalContext.setIsPending(true)
         if (reg.test(email) === true){
-            sendPasswordResetEmail(
+            await sendPasswordResetEmail(
                 auth, email)
                 .then(function() {
-                    setModalMessage('Vui lòng kiểm tra Email để khôi phục mật khẩu !');
-                    setModalVisible(true);
-                    setModalStatus(1);
+                    Alert.alert('Chờ xác nhận', 'Bạn vui lòng kiểm tra Email nhé !', [
+                        { text: 'OK', onPress: () => {navigation.goBack()} },
+                      ]);
                 })
                 .catch(function(error) {
-                    setModalMessage('Email chưa được đăng ký');
-                    setModalVisible(true);
-                    setModalStatus(1);
+                    Alert.alert('Email chưa được đăng ký', 'Bạn vui lòng kiểm tra lại nhé !', [
+                        { text: 'OK', onPress: () => console.log('OK Pressed') },
+                      ]);
            });   
         }   
         else {
-            setModalMessage('Email không hợp lệ, vui lòng thử lại');
-            setModalVisible(true);
-            setModalStatus(2);
+              Alert.alert('Email không hợp lệ', 'Bạn vui lòng kiểm tra lại nhé !', [
+                { text: 'OK', onPress: () => console.log('OK Pressed') },
+              ]);
         }
+        globalContext.setIsPending(false)
     }  
         return (
-            
+            <>
             <View style={{
                 justifyContent: "center", 
                 alignItems: "center", 
@@ -205,29 +209,8 @@ export default function Forgot({navigation}) {
                             </TouchableOpacity>
                     </View>
                 </View>
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                        setModalVisible(!modalVisible);
-                    }}>
-                    <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <View style={styles.modalTitle}>
-                            <Text style={styles.modalText}>{modalMessage}</Text>
-                        </View>
-                        
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={routingModal}>
-                        <Text style={styles.textStyle}>
-                            &nbsp;&nbsp;OK</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal>
         </View>
+        {!globalContext.isPending ?  null : <AppLoadingAnimation />}
+        </>
     )
 }
