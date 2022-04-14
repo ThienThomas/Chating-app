@@ -14,6 +14,7 @@ import {GlobalContext, UseGlobalContext} from "../GlobalContext";
 import { useContext } from "react";
 import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
 import ImageView from "react-native-image-viewing";
+import { StatusBar } from "expo-status-bar";
 const styles = StyleSheet.create({
     name: {
         fontSize: 20,
@@ -116,6 +117,7 @@ function MyInfo(){
     return (
         auth.currentUser ? (
         <>
+        <StatusBar style='transparent'></StatusBar>
         <View style={{flex: 1, backgroundColor: "white"}}>
             <LinearGradient 
                     start={{x: 0, y: 0}}

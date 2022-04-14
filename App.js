@@ -32,8 +32,9 @@ import { roundToNearestPixel } from 'react-native/Libraries/Utilities/PixelRatio
 import Avatar from './elements/Avatar';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
+import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import BottomTabNavigatorElement from './elements/BottomTabbarElements';
-
+import Chat from './screens/Chat';
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 LogBox.ignoreLogs([
@@ -43,7 +44,10 @@ LogBox.ignoreLogs([
 import UserInfo from './screens/UserInfo';
 import PointPropType from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedPointPropType';
 import ChangeInfo from './screens/Settings';
-
+import FriendsAvatar from './elements/FriendsAvatar';
+import Voice from './screens/VoiceCall';
+import VoiceCall from './screens/VoiceCall';
+import VideoChat from './screens/VideoChat';
 function App() {
   const [currUser, setCurrUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -112,22 +116,10 @@ function App() {
               <Stack.Screen 
                 name="userinfo" 
                 component={UserInfo} 
-                options={{/*
-                  headerBackTitle: <Feather name="chevron-left" size={45} color="#1590C4" />,
-                  headerBackTitleVisible: true,
-                  headerBackTitleStyle: {
-                    color: 'black'
-                  },
-                  headerBackImage: () => {""},
-                  headerRight: () => { return (
-                      <Feather name="edit" size={30} color="#1590C4" style={{marginRight: 20}}/>
-                  )},*/
-                }}
                 />
-                
             </Stack.Group>
             <Stack.Group>
-            <Stack.Screen screenOptions={{presentation: 'modal',  headerTitleStyle:{color: 'transparent'} }}
+            <Stack.Screen screenOptions={{presentation: 'modal',  headerTitleStyle:{color: 'transparent'}, }}
                   name='settings'
                   component={Settings} 
                   options={{
@@ -137,10 +129,61 @@ function App() {
                     color: 'black'
                   },
                   headerBackImage: () => {""},
-                  
                   }}
-                  
                  />
+            </Stack.Group>
+            <Stack.Group>
+            <Stack.Screen screenOptions={{presentation: 'modal'}}
+                name="chat" 
+                component={Chat} 
+                options={({route, navigation}) => ({
+                  headerBackTitle: <>
+                    <Feather name="chevron-left" size={35} color="#42C2FF" />
+                  </>,
+                  headerLeftLabelVisible: true,
+                  headerLeftContainerStyle: {
+                    width: 50
+                  },
+                  headerTitle: () => (
+                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}}>
+                    <FriendsAvatar
+                        Img={!route.params.user.photoURL === "none" ? require('./assets/user_no_avatar.jpg') : route.params.user.photoURL}
+                        Width={40}
+                        Height={40} 
+                    />
+                    <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 15, }}>{route.params.user.displayName}</Text>
+                    </TouchableOpacity>
+                   ),
+                  headerTitleContainerStyle: {
+                    marginLeft: 0
+                  },
+                  headerBackTitleVisible: true,
+                  headerBackImage: () => (<></>),
+                  headerRight: () => (
+                    <View style={{flexDirection: 'row',alignItems: 'center', justifyContent: 'center'}}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={ () => { navigation.navigate('voicecall', {user:route.params.user}) }}>
+                        <FontAwesome name="phone" size={26} color="#42C2FF" />
+                      </TouchableOpacity >
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={ () => { navigation.navigate('videochat', {user:route.params.user}) }}>
+                        <FontAwesome name="video-camera" size={26} color="#42C2FF" />                      
+                        </TouchableOpacity >
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 15}}>
+                      <MaterialIcons name="settings" size={26} color="#42C2FF" />
+                        </TouchableOpacity>
+                     </View>
+                    ),
+                  })}
+                />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown : false}}>
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="voicecall" 
+                component={VoiceCall} 
+              />
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="videochat" 
+                component={VideoChat} 
+              />
             </Stack.Group>
             </>
       )  
@@ -180,8 +223,13 @@ function Home(){
             headerLeft: props => (
               <TouchableOpacity onPress={() => {navigation.navigate('userinfo')}} style={{marginLeft: 15}}>
                 <Avatar />
-                </TouchableOpacity>
+              </TouchableOpacity>
             ),
+            headerRight: () => (
+              <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', marginRight: 15}}>
+                <MaterialIcons name="groups" size={35} color="#42C2FF" />
+              </TouchableOpacity>
+            )
             
         }
       }

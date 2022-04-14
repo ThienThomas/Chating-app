@@ -109,6 +109,7 @@ function MyProfile(){
           setDoc(doc(db, "users", user.uid), { ...userData,
             uid: user.uid, 
             listfriends: [],
+            listchats:[],
             sendRequest: [],
             receivedRequest: [],
             spams: [],

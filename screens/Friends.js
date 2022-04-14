@@ -27,6 +27,7 @@ function  ListChats(){
         setMasterDataSource(users)
         //console.log(masterDataSource)
       })
+      return () => unsubscribe()
     }, []);
     return (
       <Tab.Navigator>

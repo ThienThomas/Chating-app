@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useContext} from "react";
 import { View, Text} from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
@@ -25,6 +25,7 @@ function ListChats(){
     const [listFriends, setListFriends] = useState([])
     const [isBusy, setIsBusy] = useState(true)
     const globalContext = useContext(GlobalContext);
+    const navigation = useNavigation()
     useEffect(() => {
        setIsBusy(true)
         const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
@@ -69,9 +70,11 @@ function ListChats(){
     const ItemView = ({item}) => {
         return (
         <>
-        {isBusy === false && typeof listFriends === 'undefined' ? (<></>) : (<>
+        {isBusy === false && typeof listFriends === 'undefined' ? (<>
+          <View></View>
+        </>) : (<>
           {listFriends.find(element => element === item.uid) ? (<>
-            <TouchableOpacity onPress={() => getItem(item)}>
+            <TouchableOpacity onPress={() => {navigation.navigate('chat', {user: item})}}>
             <View style={{
               flexDirection: 'row',
               alignItems: 'center',
