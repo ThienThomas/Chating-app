@@ -110,7 +110,7 @@ function MyProfile(){
             uid: user.uid, 
             listfriends: [],
             listchats:[],
-            sendRequest: [],
+            SendRequest: [],
             receivedRequest: [],
             spams: [],
             blocks: [],

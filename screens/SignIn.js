@@ -136,7 +136,6 @@ function Form() {
                     placeholderTextColor="#D1d1d1"
                     secureTextEntry={true}
                     style={mode === "signIn" ? {display: 'none'} : styles.txt_input}
-                    
                 />
                 <View>
                     <Pressable 

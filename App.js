@@ -48,9 +48,11 @@ import FriendsAvatar from './elements/FriendsAvatar';
 import Voice from './screens/VoiceCall';
 import VoiceCall from './screens/VoiceCall';
 import VideoChat from './screens/VideoChat';
+import FriendInfo from './screens/FriendInfo';
 function App() {
   const [currUser, setCurrUser] = useState(null)
   const [loading, setLoading] = useState(true)
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setLoading(false);
@@ -145,7 +147,7 @@ function App() {
                     width: 50
                   },
                   headerTitle: () => (
-                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}}>
+                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}} onPress={() => navigation.navigate('friendinfo', {user:route.params.user})}>
                     <FriendsAvatar
                         Img={!route.params.user.photoURL === "none" ? require('./assets/user_no_avatar.jpg') : route.params.user.photoURL}
                         Width={40}
@@ -185,6 +187,10 @@ function App() {
                 component={VideoChat} 
               />
             </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown: false}}>
+                  <Stack.Screen name="friendinfo" 
+                  component={FriendInfo}/>
+            </Stack.Group>
             </>
       )  
     }
@@ -197,15 +203,10 @@ function Home(){
   return (
       <Tab.Navigator
           screenOptions={{
-            headerBackgroundContainerStyle: () => {
-              return (
-              <View style={{backgroundColor: 'orange'}}>
-              </View>
-              )
-            },
             headerStyle: {
               height: 100,
             },
+            tabBarHideOnKeyboard:true,
             headerTitleStyle:{
               color: 'black',
               fontSize: 25
@@ -230,7 +231,6 @@ function Home(){
                 <MaterialIcons name="groups" size={35} color="#42C2FF" />
               </TouchableOpacity>
             )
-            
         }
       }
       >
@@ -238,11 +238,17 @@ function Home(){
             name="Đoạn chat" 
             component={Chats} 
             options={{ 
+              tabBarBadge: "99+",
+              tabBarBadgeStyle:{
+                marginTop: 10,
+                backgroundColor: 'red'
+              },
+              
               tabBarIcon: ({focused}) => (
                   <BottomTabNavigatorElement 
                     name="message-circle"
                     focused={focused}
-                    text='Đoạn chat'/>)
+                    text='Đoạn chat'/>),
              }}
             />
           <Tab.Screen 

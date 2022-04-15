@@ -1,7 +1,7 @@
 import { collection, collectionGroup, FieldValue, getDoc, getDocs, orderBy, query, serverTimestamp, updateDoc, onSnapshot} from 'firebase/firestore';
 import React, { useState, useCallback, useEffect } from 'react'
 import { View, Text, Image, Dimensions} from "react-native";
-import { Bubble, GiftedChat , InputToolbar, Send, Time} from "react-native-gifted-chat";
+import {Bubble, GiftedChat , InputToolbar, Send, Time, Composer} from "react-native-gifted-chat";
 import { auth, db1 } from '../firebase';
 import { db } from '../firebase';
 import { doc, setDoc, addDoc } from 'firebase/firestore';
@@ -45,7 +45,7 @@ export default function Chat({route, navigation}){
     }
     useEffect(() => {
       const unsubscribe =  getAllMessages()
-      return unsubscribe
+      return () => unsubscribe()
     }, [])
     const onSend = useCallback((messageArray) => {
         console.log(messageArray)
@@ -77,10 +77,9 @@ export default function Chat({route, navigation}){
       />
       )
     }
-    const inputToolbar = props => {
+    const inputToolbar = (props) => {
       return (
         <View style={{flexDirection:'row', marginTop: 7.5}}>
-
           <TouchableOpacity style={{
             marginTop: 10,
             marginLeft: 10,
@@ -113,20 +112,19 @@ export default function Chat({route, navigation}){
               alignItems:'center',
               borderRadius: 30,
               height: 45,
-              
             }}>
-            <View style={{width: '80%'}}>
-            <TextInput {...props} chatData={messages}  value={mess} onChangeText={setMess} placeholder='Aa'  multiline={true} style={{width: '90%', margin: 7.5}}/>
+            <View style={{width: '80%', }}>
+              <InputToolbar {...props} containerStyle={{width: '95%', height: '92.5%', borderRadius: 30, borderTopWidth: 0, backgroundColor: 'transparent'  }}></InputToolbar>
+            <TextInput editable={false} style={{width: '90%', margin: 7.5}}/>
             </View>
             <TouchableOpacity onPress={() => setIsOpen(true)}>
               <MaterialIcons name="emoji-emotions" size={30} color="#42C2FF" /> 
             </TouchableOpacity>
           </View>
           <View>
-          <TouchableOpacity  style={{margin: 10}} onSend={onSend}>
-              <Ionicons name="send" size={24} color="#42C2FF" 
-              />
-            </TouchableOpacity>
+            <Send {...props}>
+              <Ionicons name="send" size={24} color="#42C2FF" style={{margin: 10}}/>
+            </Send>
           </View>
         </View>
       )
@@ -135,21 +133,21 @@ export default function Chat({route, navigation}){
       <>
         <View style={{flex: 1, backgroundColor: 'white', paddingBottom: 10}}>
         <GiftedChat
-          maxComposerHeight={10}
-          scrollToBottom={true}
-          scrollToBottomStyle={{
-            backgroundColor: 'white'
-          }}
-          
-          scrollToBottomOffset={10}
-          scrollToBottomComponent ={() => {
+            maxComposerHeight={10}
+            scrollToBottom={true}
+            scrollToBottomStyle={{
+              backgroundColor: 'white'
+            }}
+            alwaysShowSend={true}
+            scrollToBottomOffset={10}
+            scrollToBottomComponent ={() => {
               return (
                 <View style={{justifyContent: 'center',}}>
                   <Entypo name="chevron-down" size={24} color="black" />
                 </View>
               )
             }
-          }
+            }
             renderBubble={(props) => <Bubble {...props}
               textStyle={{
                 right: {
@@ -175,22 +173,20 @@ export default function Chat({route, navigation}){
             />}
             minInputToolbarHeight={55}
             locale={vi}
-            
-            alwaysShowSend={true}
             showAvatarForEveryMessage={false}
             placeholder="Aa"
             renderAvatar={avatar}
             messages={messages}
-            onSend={(text) => onSend(text)}
+            onSend={onSend}
             user={{
                 _id: auth.currentUser.uid,
             }}
-            renderInputToolbar={props => inputToolbar(props)}
+            renderSend={() => {<></>}}
             timeTextStyle={{left:{display: 'none', height: 0}, right: {display: 'none',  height: 0}}}
+            renderInputToolbar={(props) => inputToolbar(props)}
           />
         </View>
         <EmojiPicker 
-          
           translation={{
             smileys_emotion: 'BIỂU TƯỢNG CẢM XÚC',
             people_body: 'MỌI NGƯỜI',

@@ -2,7 +2,7 @@ import { Header } from "@react-navigation/stack";
 import React, {useState} from "react";
 import { View, Text, Image, StyleSheet, Alert, ImageBackground } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome} from '@expo/vector-icons';
+import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome5} from '@expo/vector-icons';
 import { Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth } from "../firebase";
@@ -89,31 +89,20 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 })
-export default function UserInfo() {
+export default function FriendInfo({route, navigation}) {
+    const user = route.params.user;
     return (
         <UseGlobalContext>
-            <MyInfo />
+            <Friend params={user}/>
         </UseGlobalContext>
     )
 }
-function MyInfo(){
+function Friend({params}){
     const user = auth.currentUser;
     const navigation = useNavigation()
     const globalContext = useContext(GlobalContext)
     const [visible, setIsVisible] = useState(false);
-
-    const signOuthandle = () => {
-        Alert.alert('Đăng xuất', 'Bạn có chắc chắn muốn đăng xuất không ?', [
-            {text: 'Hủy', onPress: () => console.log('Hủy đăng xuất')},
-            { text: 'OK', onPress: () => {
-                globalContext.setIsPending(true)
-                auth.signOut().then(()=>{
-                    globalContext.setIsPending(false)
-                    navigation.replace('signIn');
-                 }).catch(error => alert(error.message))
-            } }
-        ]); 
-    }
+    console.log(params)
     return (
         auth.currentUser ? (
         <>
@@ -130,19 +119,19 @@ function MyInfo(){
                     <View style={{flexDirection:'row', flexWrap:'wrap', width: Dimensions.get('window').width}}>
                         <View style={{width: Dimensions.get('window').width * 0.825}}>
                         <TouchableOpacity  onPress={() => {navigation.goBack()}}>
-                                <Feather name="chevron-left" size={35} color="white" />
+                            <Feather name="chevron-left" size={35} color="white" />
                         </TouchableOpacity>
                         </View>
                         <View style={{marginTop: 5}}>
-                        <TouchableOpacity  onPress={() => {navigation.navigate('settings')}}>
-                                <Feather name="settings" size={25} color="white" />
+                        <TouchableOpacity>
+                            <FontAwesome5 name="user-cog" size={25} color="white" />
                         </TouchableOpacity>
                         </View>
                     </View>
                 </View>
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
                         <ImageBackground
-                            source={!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}}
+                            source={!params.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}}
                             style={{
                                 position: 'absolute',
                                 zIndex: 5,
@@ -156,7 +145,6 @@ function MyInfo(){
                                 borderWidth: 4, 
                             }} >
                             <TouchableOpacity style={{width: "100%", height: "100%"}} onPress={() =>{setIsVisible(true)}}>
-
                             </TouchableOpacity>
                         </ImageBackground>
                     <View style={styles.viewcontent}>
@@ -168,43 +156,41 @@ function MyInfo(){
                             textAlign: 'center', 
                             fontSize: 24, 
                             fontWeight: 'bold'}}>
-                            {user.displayName}
+                            {params.displayName}
                         </Text>
-                        <TouchableOpacity 
+                        <View 
                             style={{height: 50}}
                         >
-                        { user.bio === undefined ? (
+                       
                             <View
                                 style={{justifyContent: 'center',
                                     alignItems: 'center',
                                     marginTop: 15,
                                     flexDirection:'row', 
                                     flexWrap:'wrap'}}>
-                                <MaterialCommunityIcons name="grease-pencil" size={24} color="#1590C4" />
-                                <Text
-                                    style={{
-                                    fontSize: 15,
-                                    color: '#1590C4',
-                                    paddingLeft: 5 }}>
-                                     Thêm thông tin giới thiệu
-                            </Text>    
-                            </View>
-                        ) : (
-                            <Text
+                                         { params.bio === undefined ? (<></>) : (<Text
                                 style={{
                                     fontSize: 15,
                                     color: 'black',
                                     paddingLeft: 5 
                                     }}>
-                                    {user.bio}
-                             </Text> 
-                        )
-                       }
-                        </TouchableOpacity>
+                                    {params.bio}
+                             </Text> )}
+                            </View>
+                        </View>
+                        <View  style={{
+                                    justifyContent: 'center',
+                                    alignItems: 'center', 
+                                    }}>
+                            <Text style={{fontSize: 15}}>
+                                <AntDesign name="user" size={20} color="black" />&nbsp;{params.email}
+                            </Text>
+                        </View>
+
                         <View style={{marginTop: Dimensions.get('window').height * 0.4}}>
-                                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={signOuthandle}>
+                                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}}>
                                     <Text style={styles.textlogout}>
-                                        <MaterialCommunityIcons name="logout" size={18} color="#FF7474" fontWeight="bold"/>&nbsp;Đăng xuất
+                                        <MaterialCommunityIcons name="account-cancel" size={18} color="#FF7474" fontWeight="bold"/>&nbsp;Hủy kết bạn
                                     </Text> 
                                 </TouchableOpacity>                     
                             </View>
@@ -215,7 +201,7 @@ function MyInfo(){
         </View>
         {!globalContext.isPending ? null : <AppLoadingAnimation />}
             <ImageView
-                images={[!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}]}
+                images={[!params.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}]}
                 imageIndex={0}
                 visible={visible}
                 onRequestClose={() => setIsVisible(false)}

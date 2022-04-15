@@ -11,6 +11,9 @@ import { getFirestore } from 'firebase/firestore';
 import { collection, onSnapshot, query, where} from "firebase/firestore";
 import { auth } from "../firebase";
 import { db } from "../firebase";
+import { Dimensions } from "react-native";
+import { Feather, FontAwesome} from '@expo/vector-icons';
+
 export default function Chats(){
   return (
     <UseGlobalContext>
@@ -54,8 +57,7 @@ function ListChats(){
       const searchFilterFunction = (text) => {
         if (text) {
           const newData = masterDataSource.filter(function (item) {
-            const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
-            
+            const itemData = item.displayName ? item.displayName.toUpperCase() : ''.toUpperCase();
             const textData = text.toUpperCase();
             return itemData.indexOf(textData) > -1;
           });
@@ -66,7 +68,6 @@ function ListChats(){
           setSearch(text);
         }
       };
-      
     const ItemView = ({item}) => {
         return (
         <>
@@ -80,7 +81,6 @@ function ListChats(){
               alignItems: 'center',
               marginBottom: 15
             }}>
-              
               <FriendsAvatar
                 Img={item.photoURL}
                 Width={55}
@@ -90,6 +90,14 @@ function ListChats(){
               <Text  style={{fontWeight: 'bold', fontSize: 18}}>
                   {item.displayName}
               </Text>
+              <Text style={{color: 'grey'}}>Bạn: 😆😆😆 &bull;	Thứ 3, 12:01</Text>
+              </View>
+              <View  style={{
+              flexDirection: 'row',
+              justifyContent: 'flex-end',
+              width: Dimensions.get('window').width * 0.45
+              }}>
+              
               </View>
             </View>
             </TouchableOpacity>
