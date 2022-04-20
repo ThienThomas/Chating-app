@@ -2,12 +2,11 @@ import React, { useContext, useState, useEffect } from "react";
 import { Text, View, Image, StyleSheet, Pressable, Dimensions} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { Button, Keyboard } from "react-native";
-import ConText from "../context/ConText"
-import {signUp, signIn, auth} from '../firebase'
-import Splash from "./Splash";
+import {signUp, signIn, auth} from '../../firebase'
+import Splash from "../General/Splash";
 import { useNavigation } from "@react-navigation/native";
-import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
-import {GlobalContext, UseGlobalContext} from "../GlobalContext";
+import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
+import {GlobalContext, UseGlobalContext} from "../../GlobalContext";
 import { Alert } from "react-native";
 
 const styles = StyleSheet.create({
@@ -74,9 +73,7 @@ function Form() {
     const [passwordagain, setPasswordagain] = useState("")
     const [mode, setMode] = useState("signIn")
 
-    const {
-        theme: {colors},
-    } = useContext(ConText)
+
 
     const navigation = useNavigation();
     const globalContext = useContext(GlobalContext);
@@ -107,7 +104,7 @@ function Form() {
             backgroundColor: 'white'}
             }>
             <Image 
-            source={require('../assets/welcome-img.png')}
+            source={require('../../assets/welcome-img.png')}
             style={{width: Dimensions.get('window').width * 0.55, height: Dimensions.get('window').width * 0.55}}
             resizeMethod="auto"
              />

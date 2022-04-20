@@ -1,20 +1,21 @@
 import { Header } from "@react-navigation/stack";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { View, Text, Image, StyleSheet, Alert, ImageBackground } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome} from '@expo/vector-icons';
 import { Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { auth } from "../firebase";
 import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 import Dialog from "react-native-dialog";
 import { async } from "@firebase/util";
 import { useNavigation } from "@react-navigation/native";
-import {GlobalContext, UseGlobalContext} from "../GlobalContext";
+import {GlobalContext, UseGlobalContext} from "../../GlobalContext";
 import { useContext } from "react";
-import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
 import ImageView from "react-native-image-viewing";
 import { StatusBar } from "expo-status-bar";
+import {onSnapshot, where, collection, query, doc} from "firebase/firestore";
+import {auth, db} from "../../firebase"
 const styles = StyleSheet.create({
     name: {
         fontSize: 20,
@@ -110,10 +111,11 @@ function MyInfo(){
                 auth.signOut().then(()=>{
                     globalContext.setIsPending(false)
                     navigation.replace('signIn');
-                 }).catch(error => alert(error.message))
+                }).catch(error => alert(error.message))
             } }
         ]); 
     }
+    
     return (
         auth.currentUser ? (
         <>
@@ -126,12 +128,14 @@ function MyInfo(){
                     style={styles.lineargradient}
                 />
             <View>
-                <View style={{marginTop: 35, marginLeft: 15}}>
-                    <View style={{flexDirection:'row', flexWrap:'wrap', width: Dimensions.get('window').width}}>
-                        <View style={{width: Dimensions.get('window').width * 0.825}}>
+                <View style={{marginTop: 35, marginLeft: 15, marginRight: 15}}>
+                    <View style={{flexDirection:'row', flexWrap:'wrap',  justifyContent:'space-between'}}>
+                        <View>
+                        <View>
                         <TouchableOpacity  onPress={() => {navigation.goBack()}}>
                                 <Feather name="chevron-left" size={35} color="white" />
                         </TouchableOpacity>
+                        </View>
                         </View>
                         <View style={{marginTop: 5}}>
                         <TouchableOpacity  onPress={() => {navigation.navigate('settings')}}>
@@ -142,7 +146,7 @@ function MyInfo(){
                 </View>
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
                         <ImageBackground
-                            source={!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}}
+                            source={!globalContext.userInfo.photoURL ? require('../../../PUT_Expo_Android/assets/user_no_avatar.jpg') : {uri: globalContext.userInfo.photoURL, cache: 'force-cache'}}
                             style={{
                                 position: 'absolute',
                                 zIndex: 5,
@@ -168,38 +172,27 @@ function MyInfo(){
                             textAlign: 'center', 
                             fontSize: 24, 
                             fontWeight: 'bold'}}>
-                            {user.displayName}
+                            {globalContext.userInfo.displayName}
                         </Text>
-                        <TouchableOpacity 
+                        <TouchableOpacity onPress={() => {navigation.navigate('changeBio', {mybio: globalContext.userInfo.bio, myuid:globalContext.userInfo.uid})}}
                             style={{height: 50}}
                         >
-                        { user.bio === undefined ? (
                             <View
-                                style={{justifyContent: 'center',
+                                style={{
+                                    justifyContent: 'center',
                                     alignItems: 'center',
                                     marginTop: 15,
                                     flexDirection:'row', 
                                     flexWrap:'wrap'}}>
-                                <MaterialCommunityIcons name="grease-pencil" size={24} color="#1590C4" />
+                                { globalContext.userInfo.bio === "" ? <MaterialCommunityIcons name="grease-pencil" size={24} color="#1590C4" /> : <></> }
                                 <Text
                                     style={{
-                                    fontSize: 15,
-                                    color: '#1590C4',
-                                    paddingLeft: 5 }}>
-                                     Thêm thông tin giới thiệu
-                            </Text>    
+                                        fontSize: 15,
+                                        color:  globalContext.userInfo.bio === "" ? "#1590C4" : "black",
+                                        paddingLeft: 5 }}>
+                                    { globalContext.userInfo.bio === "" ? "Thêm thông tin giới thiệu" : globalContext.userInfo.bio }
+                                    </Text>    
                             </View>
-                        ) : (
-                            <Text
-                                style={{
-                                    fontSize: 15,
-                                    color: 'black',
-                                    paddingLeft: 5 
-                                    }}>
-                                    {user.bio}
-                             </Text> 
-                        )
-                       }
                         </TouchableOpacity>
                         <View style={{marginTop: Dimensions.get('window').height * 0.4}}>
                                 <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} onPress={signOuthandle}>
@@ -213,15 +206,15 @@ function MyInfo(){
                 </View>
             </View>
         </View>
-        {!globalContext.isPending ? null : <AppLoadingAnimation />}
+        
             <ImageView
-                images={[!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}]}
+                images={[!globalContext.userInfo.photoURL ? require('../../../PUT_Expo_Android/assets/user_no_avatar.jpg') : {uri: globalContext.userInfo.photoURL, cache: 'force-cache'}]}
                 imageIndex={0}
                 visible={visible}
                 onRequestClose={() => setIsVisible(false)}
                 >
             </ImageView> 
         </>
-        ) : (<></>)
+        ) : (<><AppLoadingAnimation /></>)
     )
 }

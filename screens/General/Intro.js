@@ -6,14 +6,13 @@ import { Entypo } from '@expo/vector-icons';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Foundation, FontAwesome5, Fontisto } from '@expo/vector-icons';
-import TextGradient from '../elements/TextGradient';
+import TextGradient from '../../elements/TextGradient';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 const styles = StyleSheet.create({
     slides: {
         flex: 1, 
         backgroundColor: 'white',
-       
     },
     slideview: {
         flex: 1, 
@@ -45,7 +44,7 @@ const slides = [
       key: '1',
       title: 'Nhắn tin',
       text: 'Description.\nSay something cool',
-      image: require('../assets/welcome-img.png'),
+      image: require('../../assets/welcome-img.png'),
       backgroundColor: '#59b2ab',
       icon: <View style={styles.icon}><Entypo name="message" size={175} color='' /></View>,
       icon2: <View><Entypo name="message" size={175} style={{ opacity: 0 }}/></View>
@@ -54,7 +53,7 @@ const slides = [
       key: '2',
       title: 'Gọi điện',
       text: 'Other cool stuff',
-      image: require('../assets/welcome-img.png'),
+      image: require('../../assets/welcome-img.png'),
       backgroundColor: '#febe29',
       icon: <View style={styles.icon}><Entypo name="phone" size={175} color='' /></View>,
       icon2: <View><Entypo name="phone" size={175} style={{ opacity: 0 }}/></View>
@@ -63,7 +62,7 @@ const slides = [
       key: '3',
       title: 'Chia sẻ',
       text: 'I\'m already out of descriptions\n\nLorem ipsum bla bla bla',
-      image: require('../assets/welcome-img.png'),
+      image: require('../../assets/welcome-img.png'),
       backgroundColor: '#22bcb5',
       icon: <View style={styles.icon}><Entypo name="share" size={175} color=''  /></View>,
       icon2: <View><Entypo name="share" size={175} style={{ opacity: 0 }}/></View>

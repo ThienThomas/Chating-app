@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View ,Text, StyleSheet, Dimensions, ImageBackground, Image} from "react-native";
 import { LinearGradient } from "react-native-svg";
-import FriendsAvatar from "../elements/FriendsAvatar";
+import FriendsAvatar from "../../elements/FriendsAvatar";
 import { StatusBar } from "expo-status-bar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { AntDesign, FontAwesome, Entypo, Feather } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 const styles = StyleSheet.create({
     lineargradient: {
         position: 'absolute',
@@ -54,7 +54,7 @@ export default function VideoChat({route}) {
         <StatusBar style='transparent' /> 
         <View  style={{flex: 1, backgroundColor: "white", justifyContent:'center', alignItems: 'center',}}>
             {!response ? (<>
-                    <FriendsAvatar Img={!user.photoURL === "none" ? require('../assets/user_no_avatar.jpg') : user.photoURL}
+                    <FriendsAvatar Img={!user.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : user.photoURL}
                     Width={150}
                     Height={150}
                     ></FriendsAvatar>
@@ -62,8 +62,8 @@ export default function VideoChat({route}) {
                     <Text style={{ marginTop: 10}}>Đang gọi...</Text>
                 </>) : 
                 (<>
-                    <ImageBackground  source={! user.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: user.photoURL, cache: 'force-cache'}} style={{width: "100%", height: "100%"}} >
-                        <Image source={!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}} style={{borderRadius: 10, width: "30%", height: "30%", top: 100, left: Dimensions.get('window').width * 0.6}} />
+                    <ImageBackground  source={! user.photoURL ? require('../../assets/user_no_avatar.jpg') : {uri: user.photoURL, cache: 'force-cache'}} style={{width: "100%", height: "100%"}} >
+                        <Image source={!auth.currentUser.photoURL ? require('../../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}} style={{borderRadius: 10, width: "30%", height: "30%", top: 100, left: Dimensions.get('window').width * 0.6}} />
                     </ImageBackground>
                     
                 </>)}

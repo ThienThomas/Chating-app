@@ -2,20 +2,21 @@ import { Header } from "@react-navigation/stack";
 import React, {useState} from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome, MaterialIcons} from '@expo/vector-icons';
+import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import { Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
-import Avatar, { Name } from "../elements/Avatar";
+
+import Avatar, { Name } from "../../elements/Avatar";
 const styles = StyleSheet.create({
     viewcontent: {
         backgroundColor: 'white', 
     },
 
 })
-function MiniComponent({label, iconanme, color, size}){
+export function MiniComponent({label, iconanme, color, size}){
     return (
         <View
             style={{
@@ -58,20 +59,14 @@ export default function Settings(){
             <Name fontS={24}></Name>
           </View>
           <View style={{flex: 1, marginLeft: 20}}>
-              <TouchableOpacity>
-                <MiniComponent iconanme="email" label="Email" color="green"/>
+              <TouchableOpacity onPress={() => {navigation.navigate('myaccount')}}>
+                <MiniComponent iconanme="supervisor-account" label="Tài khoản" color="green"/>
               </TouchableOpacity>
-              <TouchableOpacity>
-                <MiniComponent iconanme="lock" label="Mật khẩu" color="#1590C4"/>
-              </TouchableOpacity>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => {navigation.navigate('notif')}}>
                 <MiniComponent iconanme="notifications" label="Thông báo" color="#FF7474"/>
               </TouchableOpacity>
-              <TouchableOpacity >
-                <MiniComponent iconanme="messenger" label="Tin nhắn" color="orange"/>
-              </TouchableOpacity >
-              <TouchableOpacity >
-                <MiniComponent iconanme="call" label="Cuộc gọi" color="purple"/>
+              <TouchableOpacity onPress={() => {navigation.navigate('darkmode')}} >
+                <MiniComponent iconanme="wb-sunny" label="Chế độ tối" color="black"/>
               </TouchableOpacity >
           </View>
         </View>

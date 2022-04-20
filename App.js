@@ -6,22 +6,21 @@ import { onAuthStateChanged} from "firebase/auth"
 import { auth } from "./firebase"
 import { NavigationContainer, useNavigation} from "@react-navigation/native"
 import { createStackNavigator}  from "@react-navigation/stack"
-import SignIn from "./screens/SignIn"
+import SignIn from './screens/Authentication/SignIn';
 import ContextWrapper from './context/ConTextWrapper';
 import "react-native-gesture-handler";
 import { async } from '@firebase/util';
 import AppLoading from 'expo-app-loading';
 import { render } from 'react-dom';
 import Context from './context/ConText';
-import Settings from './screens/Settings';
-import Profile from './screens/Profile'
-import Splash from './screens/Splash'
+import Settings from './screens/Settings/Settings';
+import Profile from './screens/Authentication/Profile';
+import Splash from './screens/General/Splash';
 import TextGradient from './elements/TextGradient';
-import Intro from './screens/Intro';
-import Forgot from './screens/Forgot'
-import Chats from './screens/Chats'
-import Friends from './screens/Friends';
-import Call from './screens/Call';
+import Intro from './screens/General/Intro';
+import Forgot from './screens/Authentication/Forgot';
+import Friends from './screens/Friend/Friends'
+import Call from './screens/Call/Call';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AntDesign, Feather,Entypo } from '@expo/vector-icons';
@@ -34,21 +33,30 @@ import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import BottomTabNavigatorElement from './elements/BottomTabbarElements';
-import Chat from './screens/Chat';
+import Chat from './screens/Chat/Chat';
+import UserInfo from './screens/User/UserInfo';
+import PointPropType from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedPointPropType';
+import FriendsAvatar from './elements/FriendsAvatar';
+import VoiceCall from './screens/Call/VoiceCall';
+import VideoChat from './screens/Call/VideoChat';
+import FriendInfo from './screens/Friend/FriendInfo';
+import SearchFriends from './screens/Friend/SearchFriends';
+import ChangeBio from './screens/User/ChangeBio';
+import Account from './screens/Settings/Account';
+import Notifications from './screens/Settings/Notifications';
+//import AllFriends from './screens/Friend/AllFriends';
+import Chats from './screens/Chat/Chats';
+import DarkMode from './screens/Settings/DarkMode';
+import CreateGroup from './screens/Chat/CreateGroupChat';
+import CreateGroupInfo from './screens/Chat/CreateGroupInfo';
+import ChangeEmail from './screens/Authentication/ChangeEmail';
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 LogBox.ignoreLogs([
   "Setting a timer",
   "AsyncStorage ...."
 ])
-import UserInfo from './screens/UserInfo';
-import PointPropType from 'react-native/Libraries/DeprecatedPropTypes/DeprecatedPointPropType';
-import ChangeInfo from './screens/Settings';
-import FriendsAvatar from './elements/FriendsAvatar';
-import Voice from './screens/VoiceCall';
-import VoiceCall from './screens/VoiceCall';
-import VideoChat from './screens/VideoChat';
-import FriendInfo from './screens/FriendInfo';
+
 function App() {
   const [currUser, setCurrUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -120,17 +128,17 @@ function App() {
                 component={UserInfo} 
                 />
             </Stack.Group>
-            <Stack.Group>
-            <Stack.Screen screenOptions={{presentation: 'modal',  headerTitleStyle:{color: 'transparent'}, }}
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Cài đặt",  headerTitleStyle:{color: 'black', fontSize: 18}, headerTitleAlign:'center'}}>
+            <Stack.Screen 
                   name='settings'
                   component={Settings} 
                   options={{
                     headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
-                                      headerBackTitleVisible: true,
-                  headerBackTitleStyle: {
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
                     color: 'black'
-                  },
-                  headerBackImage: () => {""},
+                    },
+                    headerBackImage: () => {""},
                   }}
                  />
             </Stack.Group>
@@ -163,16 +171,16 @@ function App() {
                   headerBackImage: () => (<></>),
                   headerRight: () => (
                     <View style={{flexDirection: 'row',alignItems: 'center', justifyContent: 'center'}}>
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={ () => { navigation.navigate('voicecall', {user:route.params.user}) }}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={() => { navigation.navigate('voicecall', {user:route.params.user})}}>
                         <FontAwesome name="phone" size={26} color="#42C2FF" />
                       </TouchableOpacity >
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={ () => { navigation.navigate('videochat', {user:route.params.user}) }}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={() => { navigation.navigate('videochat', {user:route.params.user})}}>
                         <FontAwesome name="video-camera" size={26} color="#42C2FF" />                      
                         </TouchableOpacity >
                       <TouchableOpacity style={{marginLeft: 10, marginRight: 15}}>
                       <MaterialIcons name="settings" size={26} color="#42C2FF" />
                         </TouchableOpacity>
-                     </View>
+                    </View>
                     ),
                   })}
                 />
@@ -188,8 +196,90 @@ function App() {
               />
             </Stack.Group>
             <Stack.Group screenOptions={{presentation: 'modal', headerShown: false}}>
-                  <Stack.Screen name="friendinfo" 
-                  component={FriendInfo}/>
+              <Stack.Screen name="friendinfo" component={FriendInfo}/>
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown: false}}>
+              <Stack.Screen name="searchFriends" component={SearchFriends}/>
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Chỉnh sửa lời giới thiệu", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen name="changeBio" component={ChangeBio}
+                options={{
+                  headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                  color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  }}
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Tài khoản", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen name="myaccount" component={Account}
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                    },
+                  headerBackImage: () => {""},
+                }}
+              />
+              </Stack.Group>
+              <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Chế độ tối", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen name="darkmode" component={DarkMode}
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                    },
+                  headerBackImage: () => {""},
+                }}
+              />
+              </Stack.Group>
+              <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Thông báo", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+                <Stack.Screen name="notif" component={Notifications}
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                }}
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Tạo nhóm", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+                <Stack.Screen name="creategroup" component={CreateGroup}
+                  options={({navigation}) => ({
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  headerRight: () => (
+                    <TouchableOpacity style={{marginRight: 15}} onPress={ () => { navigation.navigate('creategroupinfo') }}>
+                      <Text style={{fontWeight: 'bold', color: '#42C2FF'}}>Tiếp tục</Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown: false}}>
+                <Stack.Screen name="creategroupinfo" component={CreateGroupInfo} />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Email", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+                <Stack.Screen name="changeEmail" component={ChangeEmail}
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                }}
+              />
             </Stack.Group>
             </>
       )  
@@ -205,12 +295,19 @@ function Home(){
           screenOptions={{
             headerStyle: {
               height: 100,
+              backgroundColor:'white',
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20
+            },
+            headerBackgroundContainerStyle:{
+              backgroundColor: 'white'
             },
             tabBarHideOnKeyboard:true,
             headerTitleStyle:{
               color: 'black',
               fontSize: 25
             },
+            
             tabBarShowLabel: false,
             tabBarStyle: {
               position: 'absolute',
@@ -226,10 +323,16 @@ function Home(){
                 <Avatar />
               </TouchableOpacity>
             ),
-            headerRight: () => (
-              <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', marginRight: 15}}>
-                <MaterialIcons name="groups" size={35} color="#42C2FF" />
-              </TouchableOpacity>
+            headerRight: () => (<>
+              <View style={{flexDirection: 'row'}} >
+                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', marginRight: 15,  padding: 5}} onPress={() => {navigation.navigate('searchFriends')}}>
+                  <FontAwesome name="search" size={24} color="#42C2FF" />
+                </TouchableOpacity>
+                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center', marginRight: 15}} onPress={() => {navigation.navigate('creategroup')}}>
+                  <MaterialIcons name="groups" size={35} color="#42C2FF" />
+                </TouchableOpacity>
+              </View>
+              </>
             )
         }
       }
@@ -241,9 +344,7 @@ function Home(){
               tabBarBadge: "99+",
               tabBarBadgeStyle:{
                 marginTop: 10,
-                backgroundColor: 'red'
               },
-              
               tabBarIcon: ({focused}) => (
                   <BottomTabNavigatorElement 
                     name="message-circle"
@@ -251,7 +352,7 @@ function Home(){
                     text='Đoạn chat'/>),
              }}
             />
-          <Tab.Screen 
+        <Tab.Screen 
             name="Cuộc gọi" 
             component={Call} 
             options={{ 
@@ -261,17 +362,16 @@ function Home(){
                     focused={focused}
                     text='Cuộc gọi'/>)}}            
             />
-          <Tab.Screen 
+        <Tab.Screen 
             name="Bạn bè" 
             component={Friends} 
             options={{ 
               tabBarIcon: ({focused}) => (
-                  <BottomTabNavigatorElement 
-                    name="users"
-                    focused={focused}
-                    text='Bạn bè'/>)}} 
+                <BottomTabNavigatorElement 
+                  name="users"
+                  focused={focused}
+                  text='Bạn bè'/>)}} 
             />
-            
       </Tab.Navigator>
   )
 }
@@ -286,10 +386,9 @@ export default class Main extends React.Component{
                 startAsync={this._loadingRresources}
                 onFinish={() => this.setState({isReady : true})}
                 onError={console.warn}>
-              <Text>Hii</Text>
-            </AppLoading>
+                <Text>Hii</Text>
+              </AppLoading>
     }
-
     return (
       <ContextWrapper>
         <App/>
@@ -297,8 +396,5 @@ export default class Main extends React.Component{
     ) ;
   } 
   async _loadingRresources() {
-    
-
   }
 }
-

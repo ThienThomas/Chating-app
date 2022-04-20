@@ -9,12 +9,13 @@ import { createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {Database} from "firebase/database"
 import { getStorage} from "firebase/storage";
-import {Firestore, getFirestore, initializeFirestore} from "firebase/firestore";
+import {Firestore, getFirestore, initializeFirestore, enableIndexedDbPersistence} from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { async } from "@firebase/util";
 import { Alert } from "react-native";
 import { useContext } from "react";
 import GlobalContext from "./context/ConText";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -38,7 +39,7 @@ export const storage = getStorage(app);
 export const db = initializeFirestore(app, 
     {experimentalAutoDetectLongPolling: true,
 });
-export const db1 = Firestore
+
 export function signIn(email, password) {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (reg.test(email) === true){

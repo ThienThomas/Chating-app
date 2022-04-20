@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View ,Text, StyleSheet, Dimensions} from "react-native";
 import { LinearGradient } from "react-native-svg";
-import FriendsAvatar from "../elements/FriendsAvatar";
+import FriendsAvatar from "../../elements/FriendsAvatar";
 import { StatusBar } from "expo-status-bar";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { AntDesign, FontAwesome, Entypo, Feather } from '@expo/vector-icons';
@@ -47,7 +47,7 @@ export default function VoiceCall({route}) {
         <StatusBar style='transparent'></StatusBar>
         <View style={{flex: 1, backgroundColor: "white", justifyContent:'center', alignItems: 'center'}}>
         
-            <FriendsAvatar Img={!user.photoURL === "none" ? require('../assets/user_no_avatar.jpg') : user.photoURL}
+            <FriendsAvatar Img={!user.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : user.photoURL}
                 Width={150}
                 Height={150}
             ></FriendsAvatar>

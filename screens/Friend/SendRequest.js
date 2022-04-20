@@ -1,15 +1,15 @@
 import React, {useState, useEffect, useContext} from "react";
 import { View, Text, Dimensions} from "react-native";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import FriendsAvatar from "../elements/FriendsAvatar";
-import { auth } from "../firebase";
+import FriendsAvatar from "../../elements/FriendsAvatar";
+import { auth } from "../../firebase";
 import { StyleSheet } from "react-native";
 import { AntDesign } from '@expo/vector-icons'; 
 import { collection, onSnapshot, query, where} from "firebase/firestore";
-import { db } from "../firebase";
+import { db } from "../../firebase";
 import { Swipeable } from "react-native-gesture-handler";
-import { revokeRequest } from "../mymodules/FriendsTabProcessing";
-
+import { revokeRequest } from "../../mymodules/FriendsTabProcessing";
+import { KeyboardAvoidingView } from "react-native";
 const styles = StyleSheet.create({
     container: {
       backgroundColor: 'white', height: "100%", padding: 5
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 15,
-        width: Dimensions.get('window').width * 0.95
+        justifyContent:'space-between'
     },
     button: {
       borderRadius: 100, 
@@ -39,9 +39,9 @@ const styles = StyleSheet.create({
         backgroundColor: "green"
       }
   })
-export default function SendRequest({masterData}){
-    const [sendingRequest, setSendingRequest] = useState([])
-    useEffect(() => {
+export default function SendRequest({masterData, sendingRequest}){
+    //const [sendingRequest, setSendingRequest] = useState([])
+    /*useEffect(() => {
       const q1 = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid));
       const unsubscribe1 = onSnapshot(q1, (querySnapshot) => {
         let request = []
@@ -53,19 +53,20 @@ export default function SendRequest({masterData}){
         //console.log(sendingRequest)
         request = []
       })
-    }, []);
+    }, []);*/
     const ItemView = ({item}) => {
       return (
       <>
       {typeof sendingRequest !=='undefined' && sendingRequest.find(element => element === item.uid) ? (
       <Swipeable>
       <View style={styles.tabcontainer}> 
+      <View style={{flexDirection: 'row', alignItems:'center'}}>
         <FriendsAvatar
-          Img={!item.photo === "none" ? require('../assets/user_no_avatar.jpg') : item.photoURL}
+          Img={!item.photo === "none" ? require('../../../PUT_Expo_Android/assets/user_no_avatar.jpg') : item.photoURL}
           Width={55}
           Height={55}
         />
-        <View style={{marginLeft: 15, marginRight: 15, width: Dimensions.get('window').width * 0.55}}>
+        <View style={{marginLeft: 15, marginRight: 15}}>
         <Text style={{fontWeight: 'bold', fontSize: 18}}>
             {item.displayName}
         </Text>
@@ -73,11 +74,12 @@ export default function SendRequest({masterData}){
             {item.email}
         </Text>
         </View>
-        <View style={{alignItems: 'flex-end'}}>
+        </View>
+        <View>
           <TouchableOpacity 
                 style={[styles.button, styles.revokeRequest]}
                 onPress={() => revokeRequest(item)}
-        >
+          >
           <AntDesign name="deleteuser" size={25} color="white" />
           </TouchableOpacity>
         </View>
@@ -88,7 +90,7 @@ export default function SendRequest({masterData}){
       );
     };
       return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container}>
           <FlatList
               data={masterData}
               keyExtractor={(item, index) => index.toString()}
@@ -98,6 +100,6 @@ export default function SendRequest({masterData}){
               style={{marginBottom: 85, padding: 10}}
           >
           </FlatList>
-        </View>
+        </KeyboardAvoidingView>
       )
   }

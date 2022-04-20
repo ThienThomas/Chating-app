@@ -1,27 +1,25 @@
 import React, {useState, useEffect, useContext} from "react";
-import { View, Text} from "react-native";
+import { View, Text, Dimensions, KeyboardAvoidingView} from "react-native";
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { SearchBar } from "react-native-elements";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import FriendsAvatar from "../elements/FriendsAvatar";
-import GlobalContext from "../context/ConText";
-import { UseGlobalContext } from "../GlobalContext";
+import FriendsAvatar from "../../elements/FriendsAvatar";
+import GlobalContext from "../../context/ConText";
+import { UseGlobalContext } from "../../GlobalContext";
 import { getFirestore } from 'firebase/firestore';
 import { collection, onSnapshot, query, where} from "firebase/firestore";
-import { auth } from "../firebase";
-import { db } from "../firebase";
-import { Dimensions } from "react-native";
+import { auth } from "../../firebase";
+import { db } from "../../firebase";
 import { Feather, FontAwesome} from '@expo/vector-icons';
-
-export default function Chats(){
+export default function Call(){
   return (
     <UseGlobalContext>
-      <ListChats></ListChats>
+      <ListCall></ListCall>
     </UseGlobalContext>
   )
 }
-function ListChats(){
+function ListCall(){
     const [search, setSearch] = useState('');
     const [filteredDataSource, setFilteredDataSource] = useState([]);
     const [masterDataSource, setMasterDataSource] = useState([]);
@@ -58,6 +56,7 @@ function ListChats(){
         if (text) {
           const newData = masterDataSource.filter(function (item) {
             const itemData = item.displayName ? item.displayName.toUpperCase() : ''.toUpperCase();
+            
             const textData = text.toUpperCase();
             return itemData.indexOf(textData) > -1;
           });
@@ -68,6 +67,7 @@ function ListChats(){
           setSearch(text);
         }
       };
+      
     const ItemView = ({item}) => {
         return (
         <>
@@ -75,12 +75,13 @@ function ListChats(){
           <View></View>
         </>) : (<>
           {listFriends.find(element => element === item.uid) ? (<>
-            <TouchableOpacity onPress={() => {navigation.navigate('chat', {user: item})}}>
             <View style={{
               flexDirection: 'row',
               alignItems: 'center',
-              marginBottom: 15
+              marginBottom: 15,
+              justifyContent:'space-between'
             }}>
+             <View style={{flexDirection: 'row', alignItems:'center'}}>
               <FriendsAvatar
                 Img={item.photoURL}
                 Width={55}
@@ -90,17 +91,19 @@ function ListChats(){
               <Text  style={{fontWeight: 'bold', fontSize: 18}}>
                   {item.displayName}
               </Text>
-              <Text style={{color: 'grey'}}>Bạn: 😆😆😆 &bull;	Thứ 3, 12:01</Text>
+                 <Text style={{color: 'grey'}}><Feather name="arrow-down-left" size={15} color="green"  />Hôm nay, 12:00</Text>
               </View>
-              <View  style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              width: Dimensions.get('window').width * 0.45
-              }}>
-              
+              </View>
+              <View style={{flexDirection: 'row', alignItems:'center'}}>
+              <TouchableOpacity style={{ marginRight: 10}} onPress={ () => { navigation.navigate('voicecall', {user:item}) }}>
+                <FontAwesome name="phone" size={26} color="#42C2FF" />
+              </TouchableOpacity >
+                <TouchableOpacity style={{marginLeft: 10}} onPress={ () => { navigation.navigate('videochat', {user:item}) }}>
+                 <FontAwesome name="video-camera" size={26} color="#42C2FF" />                      
+              </TouchableOpacity >
               </View>
             </View>
-            </TouchableOpacity>
+           
           </>) : (<></>)}
         </>)}
         </>
@@ -133,6 +136,7 @@ function ListChats(){
                 value={search}
             >
             </SearchBar>
+            <KeyboardAvoidingView>
             <FlatList
                 data={filteredDataSource}
                 keyExtractor={(item, index) => index.toString()}
@@ -142,6 +146,7 @@ function ListChats(){
                 style={{marginBottom: 85, padding: 10}}
             >
             </FlatList>
+            </KeyboardAvoidingView>
         </View>
         {!globalContext.isPending ?  null : <AppLoadingAnimation />}
         </>

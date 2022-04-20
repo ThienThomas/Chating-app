@@ -2,12 +2,12 @@ import { collection, collectionGroup, FieldValue, getDoc, getDocs, orderBy, quer
 import React, { useState, useCallback, useEffect } from 'react'
 import { View, Text, Image, Dimensions} from "react-native";
 import {Bubble, GiftedChat , InputToolbar, Send, Time, Composer} from "react-native-gifted-chat";
-import { auth, db1 } from '../firebase';
-import { db } from '../firebase';
+import { auth, db1 } from '../../firebase';
+import { db } from '../../firebase';
 import { doc, setDoc, addDoc } from 'firebase/firestore';
 import { defaultTheme } from '@rneui/base';
 import { async } from '@firebase/util';
-import FriendsAvatar from '../elements/FriendsAvatar';
+import FriendsAvatar from '../../elements/FriendsAvatar';
 import { FontAwesome, Feather, Ionicons  } from '@expo/vector-icons';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { Entypo, MaterialIcons  } from '@expo/vector-icons';
@@ -59,7 +59,12 @@ export default function Chat({route, navigation}){
         setMessages(previousMessages => GiftedChat.append(previousMessages, mymsg))
         const docid = user.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + user.uid : user.uid + "-" + auth.currentUser.uid
         setDoc(doc(db, 'chatrooms', docid), {
-          draf: []
+          draf: [],
+          lastmessage: {
+            ...mymsg
+          },
+          participants: [user.uid, auth.currentUser.uid],
+          seen: false
         })
         const docRef = doc(db, 'chatrooms', docid);
         const colRef = collection(docRef, "messages");
@@ -71,7 +76,7 @@ export default function Chat({route, navigation}){
     const avatar = () => {
       return (
       <FriendsAvatar
-       Img={!user.photoURL === "none" ? require('../assets/user_no_avatar.jpg') : user.photoURL}
+       Img={!user.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : user.photoURL}
         Width={36}
        Height={36} 
       />

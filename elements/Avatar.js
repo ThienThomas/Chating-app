@@ -1,19 +1,27 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View,Text, TouchableOpacity, Image } from "react-native";
 import { auth } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 import { urlAlphabet } from "nanoid";
 import  ImageViewer from 'react-native-image-zoom-viewer';
-export default function Avatar({Width, Height}) {
+import { GlobalContext, UseGlobalContext } from "../GlobalContext";
+export default function Avatar({Width, Height}){
+  return (
+    <UseGlobalContext>
+      <MyAvatar w={Width} h={Height}></MyAvatar>
+    </UseGlobalContext>
+  )
+}
+function MyAvatar({w, h}) {
     const navigation = useNavigation();
+    const globalContext = useContext(GlobalContext)
     return (
-      
         auth.currentUser ? (
           <View>
           <Image
-              source={!auth.currentUser.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}}
-                  style={{width: !Width ? 45 : Width, 
-                  height: !Height ? 45 : Height,
+              source={!globalContext.userInfo.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: globalContext.userInfo.photoURL, cache: 'force-cache'}}
+                  style={{width: !w ? 45 : w, 
+                  height: !h ? 45 : h,
                   borderRadius: 200
                   }}
                   resizeMethod="auto">

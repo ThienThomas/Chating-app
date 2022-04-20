@@ -5,17 +5,17 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import {FontAwesome, MaterialCommunityIcons, Fontisto, Ionicons, Entypo } from "@expo/vector-icons"
 import { setSelectedLog } from "react-native/Libraries/LogBox/Data/LogBoxData";
 import * as ImagePicker from 'expo-image-picker'
-import { app, auth, db, storage} from '../firebase'
-import { uploadImage } from "../utils";
+import { app, auth, db, storage} from "../../firebase";
+import { uploadImage } from "../../utils";
 import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytes} from "firebase/storage";
-import { cacheImages, _loadAssetsAsync } from "../AssetsCaching";
+import { cacheImages, _loadAssetsAsync } from "../../AssetsCaching";
 import { getDatabase, ref,  onValue, set } from "firebase/database";
 import { async } from "@firebase/util";
-import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
 import { useNavigation } from "@react-navigation/native";
-import { GlobalContext, UseGlobalContext } from "../GlobalContext";
+import { GlobalContext, UseGlobalContext } from "../../GlobalContext";
 export default function Profile(){
     return (
         <UseGlobalContext>
@@ -114,6 +114,7 @@ function MyProfile(){
             receivedRequest: [],
             spams: [],
             blocks: [],
+            bio: ""
             }),
         ]);
         globalContext.setIsPending(false);

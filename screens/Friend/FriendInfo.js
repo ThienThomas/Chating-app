@@ -5,14 +5,14 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome5} from '@expo/vector-icons';
 import { Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { auth } from "../firebase";
+import { auth } from "../../firebase";
 import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
 import Dialog from "react-native-dialog";
 import { async } from "@firebase/util";
 import { useNavigation } from "@react-navigation/native";
-import {GlobalContext, UseGlobalContext} from "../GlobalContext";
+import {GlobalContext, UseGlobalContext} from "../../GlobalContext";
 import { useContext } from "react";
-import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
 import ImageView from "react-native-image-viewing";
 import { StatusBar } from "expo-status-bar";
 const styles = StyleSheet.create({
@@ -115,9 +115,9 @@ function Friend({params}){
                     style={styles.lineargradient}
                 />
             <View>
-                <View style={{marginTop: 35, marginLeft: 15}}>
-                    <View style={{flexDirection:'row', flexWrap:'wrap', width: Dimensions.get('window').width}}>
-                        <View style={{width: Dimensions.get('window').width * 0.825}}>
+                <View style={{marginTop: 35, marginLeft: 15, marginRight: 15}}>
+                    <View style={{flexDirection:'row', flexWrap:'wrap',justifyContent:'space-between'}}>
+                        <View>
                         <TouchableOpacity  onPress={() => {navigation.goBack()}}>
                             <Feather name="chevron-left" size={35} color="white" />
                         </TouchableOpacity>
@@ -131,7 +131,7 @@ function Friend({params}){
                 </View>
                 <View style={{alignItems: 'center', justifyContent: 'center'}}>
                         <ImageBackground
-                            source={!params.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}}
+                            source={!params.photoURL ? require('../../../PUT_Expo_Android/assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}}
                             style={{
                                 position: 'absolute',
                                 zIndex: 5,
@@ -201,7 +201,7 @@ function Friend({params}){
         </View>
         {!globalContext.isPending ? null : <AppLoadingAnimation />}
             <ImageView
-                images={[!params.photoURL ? require('../assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}]}
+                images={[!params.photoURL ? require('../../../PUT_Expo_Android/assets/user_no_avatar.jpg') : {uri: params.photoURL, cache: 'force-cache'}]}
                 imageIndex={0}
                 visible={visible}
                 onRequestClose={() => setIsVisible(false)}

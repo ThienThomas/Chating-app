@@ -2,17 +2,17 @@ import React, { useContext, useState } from "react";
 import { Text, View, Image, StyleSheet, Pressable, Dimensions} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { Button } from "react-native-web";
-import ConText from "../context/ConText"
-import {signUp, signIn} from '../firebase'
-import Splash from "./Splash";
+import ConText from "../../context/ConText"
+import {signUp, signIn} from '../../firebase'
+import Splash from "../General/Splash";
 import { sendPasswordResetEmail } from 'firebase/auth'; 
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 import { Modal } from "react-native";
 import {FontAwesome, MaterialCommunityIcons, Fontisto, Ionicons, Entypo } from "@expo/vector-icons"
 import { render } from "react-dom";
 import { useNavigation } from "@react-navigation/native";
-import { GlobalContext, UseGlobalContext } from "../GlobalContext";
-import { AppLoadingAnimation } from "../elements/AppLoadingAnimation";
+import { GlobalContext, UseGlobalContext } from "../../GlobalContext";
+import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
 import { Alert } from "react-native";
 import { async } from "@firebase/util";
 import { Keyboard } from "react-native";
@@ -172,7 +172,7 @@ function MyForgot() {
                 backgroundColor: 'white'}
                 }>
                 <Image 
-                source={require('../assets/welcome-img.png')}
+                source={require('../../assets/welcome-img.png')}
                 style={{width: Dimensions.get('window').width * 0.55, height: Dimensions.get('window').width * 0.55}}
                 resizeMethod="auto"
                 />

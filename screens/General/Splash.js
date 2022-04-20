@@ -5,9 +5,9 @@ import { Dimensions } from "react-native";
 import { Asset, useAssets } from 'expo-asset';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
-import TextGradient from '../elements/TextGradient';
+import TextGradient from '../../elements/TextGradient';
 export default function Splash({navigation}){
-    const [assets, error] = useAssets([require('../assets/welcome-img.png')])
+    const [assets, error] = useAssets([require('../../assets/welcome-img.png')])
     setTimeout(()=>{
        navigation.replace('intro');
     }, 2000)

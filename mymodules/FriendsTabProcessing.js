@@ -3,7 +3,7 @@ import { auth } from "../firebase";
 import { doc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, setDoc} from "firebase/firestore";
 
 import { db } from "../firebase";
-export async function sendingRequest(item) {
+export async function sendingMyRequest(item) {
     Promise.all([
       updateDoc(doc(db, "users", item.uid), {
       receivedRequest: arrayUnion(auth.currentUser.uid)
@@ -24,11 +24,12 @@ export async function acceptRequest(item){
     ])
     const docid = item.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + item.uid : item.uid + "-" + auth.currentUser.uid
     setDoc(doc(db, 'chatrooms', docid),{
-      draf: []
+      draf: [],
+      users: item.uid > auth.currentUser.uid ? [auth.currentUser.uid, item.uid] : [item.uid, auth.currentUser.uid]
     })
     const colRef = collection(doc(db, 'chatrooms', docid), "messages");
     addDoc(colRef, {
-      Initmessages: []
+      Initmessages: [],
     })
     const colRef2 = collection(doc(db, 'chatrooms', docid), "videocall");
     addDoc(colRef2, {
@@ -43,6 +44,7 @@ export async function acceptRequest(item){
         listchats: arrayUnion(docid)
       })
     ])
+    
   }
 export async function revokeRequest(item) {
     Promise.all([
