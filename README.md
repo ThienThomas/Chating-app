@@ -1,10 +1,10 @@
 # PUT Expo Android
 
-Welcome you to our Team-workspace of PUT Expo Android Project !
+Welcome you to my Expo Android Project !
 
 This project is about programing Android application bases on some high-quality, fun and ... light flatform.
 
-Please check back soon, we're still sitting on the moon !
+
 
 ## Dependencies in the Project: 
 - @react-native-masked-view/masked-view: 0.2.6
