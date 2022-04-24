@@ -2,7 +2,7 @@
 
 Welcome you to my Expo Android Project !
 
-This project is about programing Android application bases on some high-quality, fun and ... light flatform.
+This project is about programing Android application based on Expo - ReactNative.
 
 
 
