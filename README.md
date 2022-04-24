@@ -1,6 +1,6 @@
 # PUT Expo Android
 
-Welcome you to my Expo Android Project !
+Welcome to my Expo Android Project !
 
 This project is about programing Android application based on Expo - ReactNative.
 
