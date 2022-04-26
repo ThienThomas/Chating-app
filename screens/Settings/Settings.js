@@ -1,5 +1,5 @@
 import { Header } from "@react-navigation/stack";
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { AntDesign, Feather,Entypo, MaterialCommunityIcons, FontAwesome, MaterialIcons, FontAwesome5} from '@expo/vector-icons';
@@ -8,8 +8,8 @@ import { Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth } from "../../firebase";
 import Pressable from "react-native/Libraries/Components/Pressable/Pressable";
-
 import Avatar, { Name } from "../../elements/Avatar";
+import { GlobalContext, UseGlobalContext } from "../../GlobalContext";
 const styles = StyleSheet.create({
     viewcontent: {
         backgroundColor: 'white', 
@@ -49,9 +49,16 @@ export function MiniComponent({label, iconanme, color, size}){
     )
 }
 export default function Settings(){
+    return (
+        <UseGlobalContext>
+            <Setting></Setting>
+        </UseGlobalContext>
+    )
+}
+function Setting(){
+    const globalContext = useContext(GlobalContext)
     const navigation = useNavigation();
     const user = auth.currentUser;
-
     return (
         <View style={{flex: 1, backgroundColor: "white"}}>
           <View style={{justifyContent: 'center', alignItems: 'center'}}>
@@ -59,7 +66,7 @@ export default function Settings(){
             <Name fontS={24}></Name>
           </View>
           <View style={{flex: 1, marginLeft: 20}}>
-              <TouchableOpacity onPress={() => {navigation.navigate('myaccount')}}>
+              <TouchableOpacity onPress={() => {navigation.navigate('recredential')}}>
                 <MiniComponent iconanme="supervisor-account" label="Tài khoản" color="green"/>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => {navigation.navigate('notif')}}>

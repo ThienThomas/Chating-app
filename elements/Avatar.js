@@ -28,9 +28,20 @@ function MyAvatar({w, h}) {
           </Image>
         </View>
         ) : (<></>)
-      
     )
 }
 export function Name({fontS}){
-  return <Text style={{textAlign: 'center', justifyContent: 'center', alignItems: 'center', fontSize: 24,marginTop: 15, marginBottom: 15, fontWeight: 'bold'}}>{auth.currentUser.displayName}</Text>
+  return (
+    <UseGlobalContext>
+      <MyName fonts={fontS}/>
+    </UseGlobalContext>
+  )
+}
+function MyName({fonts}){
+  const globalContext = useContext(GlobalContext)
+  return (
+    auth.currentUser ? (
+      <Text style={{textAlign: 'center', justifyContent: 'center', alignItems: 'center', fontSize: 24,marginTop: 15, marginBottom: 15, fontWeight: 'bold'}}>{globalContext.userInfo.displayName}</Text>
+    ) : (<></>)
+  )
 }

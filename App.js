@@ -50,6 +50,7 @@ import DarkMode from './screens/Settings/DarkMode';
 import CreateGroup from './screens/Chat/CreateGroupChat';
 import CreateGroupInfo from './screens/Chat/CreateGroupInfo';
 import ChangeEmail from './screens/Authentication/ChangeEmail';
+import ReCredential from './screens/Authentication/ReCredential';
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 LogBox.ignoreLogs([
@@ -155,7 +156,7 @@ function App() {
                     width: 50
                   },
                   headerTitle: () => (
-                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}} onPress={() => navigation.navigate('friendinfo', {user:route.params.user})}>
+                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}} onPress={() => navigation.navigate('friendinfo', {user:route.params.user, seen: route.params.seen,  By: route.params.By})}>
                     <FriendsAvatar
                         Img={!route.params.user.photoURL === "none" ? require('./assets/user_no_avatar.jpg') : route.params.user.photoURL}
                         Width={40}
@@ -213,8 +214,8 @@ function App() {
                   }}
               />
             </Stack.Group>
-            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Tài khoản", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
-              <Stack.Screen name="myaccount" component={Account}
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Xác thực người dùng", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen name="recredential" component={ReCredential}
                   options={{
                     headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
                     headerBackTitleVisible: true,
@@ -225,6 +226,18 @@ function App() {
                 }}
               />
               </Stack.Group>
+              <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Tài khoản", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen name="account" component={Account}
+                  options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                    },
+                  headerBackImage: () => {""},
+                }}
+              />
+              </Stack.Group>              
               <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Chế độ tối", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
               <Stack.Screen name="darkmode" component={DarkMode}
                   options={{

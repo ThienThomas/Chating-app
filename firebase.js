@@ -9,7 +9,7 @@ import { createUserWithEmailAndPassword,
 } from "firebase/auth";
 import {Database} from "firebase/database"
 import { getStorage} from "firebase/storage";
-import {Firestore, getFirestore, initializeFirestore, enableIndexedDbPersistence} from "firebase/firestore";
+import {Firestore, getFirestore, initializeFirestore, enableIndexedDbPersistence, CACHE_SIZE_UNLIMITED} from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { async } from "@firebase/util";
 import { Alert } from "react-native";
@@ -36,9 +36,11 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
 export const db = initializeFirestore(app, 
-    {experimentalAutoDetectLongPolling: true,
-});
+    {
+        experimentalAutoDetectLongPolling: true 
+    });
 
 export function signIn(email, password) {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;

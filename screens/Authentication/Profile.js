@@ -44,14 +44,14 @@ function MyProfile(){
         setHasGalleryPermission('granted');
     }
     async function Picker(){
-        if (hasCameraPermission !== 'granted' || hasGalleryPermission !== 'granted'){
+        /*if (hasCameraPermission !== 'granted' || hasGalleryPermission !== 'granted'){
             requestCameraPermission();
             setModalVisible(true);
         }
-        else setModalVisible(true);
+        else*/ setModalVisible(true);
     }
     async function handleProfilePicture(val){
-        if (hasCameraPermission === 'granted' || hasGalleryPermission === 'granted'){
+        //if (hasCameraPermission === 'granted' || hasGalleryPermission === 'granted'){
             if (val === 1){
                 const result = await ImagePicker.launchCameraAsync();
                 if (!result.cancelled){
@@ -66,8 +66,8 @@ function MyProfile(){
                     setModalVisible(false);
                 } 
             }
-        }
-        else requestCameraPermission();
+        //}
+        //else requestCameraPermission();
     }
     async function uploadDatabase(Uid, Name, Email, PhotoURL){
         const rdb = getDatabase();

@@ -2,6 +2,7 @@ import { collection, onSnapshot, query, where, getDocsFromServer, getDocsFromCac
 import React, {createContext, useContext, useEffect, useState} from 'react'
 //import { auth, db } from './firebase';
 import { auth, db } from './firebase';
+import NotificationsOfNewmess from './mymodules/LocalNotification';
 const GlobalContext = createContext({
     rooms: [], 
     setRooms: () => {}
@@ -28,7 +29,7 @@ const UseGlobalContext = ({children}) => {
             users.push(doc.data())
         })
         setMasterData(users)
-        console.log(users)
+        //console.log(users)
         //Tin nhắn mới nhất
             const colRef2 = query(collection(db, "chatrooms"), where("participants", 'array-contains', auth.currentUser.uid))
             let Docs1 = await getDocsFromCache(colRef2)
@@ -37,7 +38,7 @@ const UseGlobalContext = ({children}) => {
                 chatrooms.push(doc.data())
             })
             setChatRooms(chatrooms)
-        
+            
         const colRef3 = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
         let Docs2 = await getDocsFromCache(colRef3)
         let ListC = [] 
@@ -54,9 +55,6 @@ const UseGlobalContext = ({children}) => {
         setListFriends(ListF)
         setSendingRequest(ListS)
         setReceivedRequest(ListR)
-        //console.log(masterData)
-        //console.log(listFriends)
-        //console.log(listChats)
     }
     /*useState(() => {
         getdocfromServer()
@@ -70,7 +68,6 @@ const UseGlobalContext = ({children}) => {
                 querySnapshot.forEach((doc) => {
                     users.push(doc.data())
                 })
-                
                 setMasterData(users)
             })
             setIsBusy(false)
@@ -97,12 +94,21 @@ const UseGlobalContext = ({children}) => {
         if (auth.currentUser){
             setIsBusy(true)
             const q = query(collection(db, "chatrooms"), where("participants", 'array-contains', auth.currentUser.uid))
-            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            onSnapshot(q, (querySnapshot) => {
                 let rooms = []
                 querySnapshot.forEach((doc) => {
                     rooms.push(doc.data())
                 })
+                rooms.sort((a, b) => {
+                    return b.lastmessage.createdAt - a.lastmessage.createdAt
+                })
                 setChatRooms(rooms)
+                /*querySnapshot.docChanges().forEach((change) => {
+                    if (change.type === "modified") {
+                        console.log(change.doc.data())
+                        //NotificationsOfNewmess()
+                    }
+                })*/
             })
             setIsBusy(false)
             return () => unsubscribe()

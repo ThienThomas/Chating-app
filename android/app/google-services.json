@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "722506971967",
+    "firebase_url": "https://nativefirebase-2b9b8-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "nativefirebase-2b9b8",
+    "storage_bucket": "nativefirebase-2b9b8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722506971967:android:7f215a71eeda897401718a",
+        "android_client_info": {
+          "package_name": "com.thien135790.wpclone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "722506971967-rvrofjac46l1q3hu9e5o8mdhk18bhtsv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArmljJMLQzPM-aq0tL28nHETriE9L1XQU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "722506971967-rvrofjac46l1q3hu9e5o8mdhk18bhtsv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

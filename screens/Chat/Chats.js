@@ -7,7 +7,7 @@ import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import FriendsAvatar from "../../elements/FriendsAvatar";
 import { GlobalContext } from "../../GlobalContext";
 import { UseGlobalContext } from "../../GlobalContext";
-import { DocumentReference, getDocsFromServer, getDocs, getFirestore, limit, orderBy } from 'firebase/firestore';
+import { DocumentReference, getDocsFromServer, getDocs, getFirestore, limit, orderBy, serverTimestamp } from 'firebase/firestore';
 import { collection, onSnapshot, query, where, doc, getDoc} from "firebase/firestore";
 import { auth } from "../../firebase";
 import { db } from "../../firebase";
@@ -125,6 +125,7 @@ function ListChats(){
         return () => unsubscribe()
       }
      }, [])*/
+  
       const searchFilterFunction = (text) => {
         if (text) {
           const newData = listRooms.filter(function (item) {
@@ -146,38 +147,56 @@ function ListChats(){
         }
         else {
           userInfo = globalContext.masterData.find(element => element.uid == item.lastmessage.sentBy || element.uid == item.lastmessage.sendTo)
-          console.log(userInfo)
+          //console.log(userInfo)
         }
         return (
           <>
             {!globalContext.chatRooms && !globalContext.masterDataIsOnGetting ?  (<></>) : (<>
-           <TouchableOpacity onPress={() => {navigation.navigate('chat', {user: userInfo})}}>
+           <TouchableOpacity onPress={() => {navigation.navigate('chat', {user: userInfo, seen: item.seen, By: item.lastmessage.sentBy })}}>
             <View style={{
               flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 15
+              alignItems:'center',
+              marginBottom: 15,
             }}>
+              <View style={{width: 55}}>
               <FriendsAvatar
                 Img={userInfo.photoURL}
                 Width={55}
                 Height={55}
               />
-              <View style={{marginLeft: 15}}>
-              <Text  style={{fontWeight: 'bold', fontSize: 18}}>
-                  {userInfo.displayName}
-              </Text>
-              <Text style={{
-                fontWeight: !item.seen && item.lastmessage.sendTo === auth.currentUser.uid ? 'bold' : 'normal'
-              }}>
-                {item.lastmessage.sentBy != auth.currentUser.uid ? null : "Bạn: "} {item.lastmessage.text}
-              </Text>
               </View>
-              <View  style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-end',
-              width: Dimensions.get('window').width * 0.45
-              }}>
+              <View style={{marginLeft: 15, marginRight: 5, flex: 1}}>
+                <View style={{
+                    justifyContent:'space-between', 
+                    flexDirection: 'row',                    
+                  }}>
+                    <Text  style={{fontWeight: 'bold', fontSize: 18, textAlign:'center'}}>
+                      {userInfo.displayName} 
+                    </Text >
+                    <View style={{justifyContent:'center'}}>
+                    <Text >
+                      {new Date(item.lastmessage.createdAt.toDate()).toLocaleDateString()}
+                    </Text>
+                    </View>
+                </View>
+                <View>
+                <View style={{
+                    justifyContent:'space-between', 
+                    flexDirection: 'row',      
+                  }}>
+                <Text style={{
+                  fontWeight: !item.seen && item.lastmessage.sendTo === auth.currentUser.uid ? 'bold' : 'normal'
+                }}>
+                  
+                  {item.lastmessage.sentBy != auth.currentUser.uid ? null : "Bạn: "}{item.lastmessage.text !== "" ? item.lastmessage.text : "Hình ảnh"} 
+                </Text>
+                  <View style={{justifyContent:'center'}}>
+                  {!item.seen && item.lastmessage.sentBy !== auth.currentUser.uid ? <View style={{width: 10 ,height: 10, backgroundColor:'#42C2FF', borderRadius: 20}}></View> :<></>} 
+                  </View>
+                </View>
+                </View>
               </View>
+             
             </View>
             </TouchableOpacity>
             </>)}

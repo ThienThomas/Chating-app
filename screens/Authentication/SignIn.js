@@ -92,9 +92,7 @@ function Form() {
             }
         }
         globalContext.setIsPending(false)
-        
     }
-    
     return (
         <>
         <View style={{

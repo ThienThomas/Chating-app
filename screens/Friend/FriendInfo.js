@@ -186,9 +186,8 @@ function Friend({params}){
                                 <AntDesign name="user" size={20} color="black" />&nbsp;{params.email}
                             </Text>
                         </View>
-
                         <View style={{marginTop: Dimensions.get('window').height * 0.4}}>
-                                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}}>
+                                <TouchableOpacity style={{justifyContent: 'center', alignItems: 'center'}} op>
                                     <Text style={styles.textlogout}>
                                         <MaterialCommunityIcons name="account-cancel" size={18} color="#FF7474" fontWeight="bold"/>&nbsp;Hủy kết bạn
                                     </Text> 

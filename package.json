@@ -1,9 +1,8 @@
 {
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "eject": "expo eject"
   },
@@ -23,16 +22,18 @@
     "expo-camera": "~12.1.2",
     "expo-constants": "~13.0.2",
     "expo-contacts": "~10.1.1",
+    "expo-device": "~4.1.0",
     "expo-font": "~10.0.4",
     "expo-image-picker": "~12.0.2",
     "expo-linear-gradient": "~11.0.3",
+    "expo-notifications": "~0.14.0",
     "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",
     "expo-updates": "~0.11.6",
     "firebase": "^9.6.10",
     "lottie-react-native": "^5.0.1",
     "nanoid": "^3.1.30",
-    "react": "17.0.2",
+    "react": "17.0.1",
     "react-dom": "17.0.2",
     "react-native": "0.64.3",
     "react-native-app-intro-slider": "^4.0.4",
@@ -43,7 +44,7 @@
     "react-native-gesture-handler": "~2.1.0",
     "react-native-get-random-values": "~1.7.0",
     "react-native-gifted-chat": "^0.16.3",
-    "react-native-image-viewing": "^0.2.1",
+    "react-native-image-viewing": "^0.2.2",
     "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-pager-view": "5.4.9",
     "react-native-progress": "^5.0.0",
@@ -57,5 +58,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.9"
   },
-  "private": true
+  "private": true,
+  "name": "PUT_Expo_Android",
+  "version": "1.0.0"
 }
