@@ -114,7 +114,8 @@ function MyProfile(){
             receivedRequest: [],
             spams: [],
             blocks: [],
-            bio: ""
+            bio: "",
+            groupchats: []
             }),
         ]);
         globalContext.setIsPending(false);

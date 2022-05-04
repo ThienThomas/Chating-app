@@ -1,87 +1,86 @@
-import React, { useEffect, useState } from "react";
-import { View ,Text, StyleSheet, Dimensions, ImageBackground, Image} from "react-native";
-import { LinearGradient } from "react-native-svg";
-import FriendsAvatar from "../../elements/FriendsAvatar";
-import { StatusBar } from "expo-status-bar";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import React from 'react'
 import { AntDesign, FontAwesome, Entypo, Feather } from '@expo/vector-icons';
-import { useNavigation } from "@react-navigation/native";
-import { auth } from "../../firebase";
+
+import { MediaStream, RTCView } from 'react-native-webrtc'
 const styles = StyleSheet.create({
-    lineargradient: {
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        top: 0,
-        height: '100%',
-        borderBottomRightRadius: 25,
-        borderBottomLeftRadius: 25,
+    bContainer: {
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     icon: {
-        margin: 7.5,
+      margin: 7.5,
+      bottom: 0
     },
     icon_opa: {
         borderRadius: 100,
         padding: 15,
     },
-    speaker: {
-        backgroundColor: "#d1d1d1",
-        
+    video: {
+      position: 'absolute',
+      width: "100%",
+      height: "100%"
     },
-    close: {
-        backgroundColor: "#FF5757",
-    },
-    backgroundImage: {
-        flex: 1,
-        resizeMode: 'cover', // or 'stretch'
+    videoLocal: {
+      position: 'absolute',
+      width: 100,
+      height: 150,
+      top: 0,
+      left: 20,
+      elevation: 10
     }
-})
-export default function VideoChat({route}) {
-    const user = route.params.user
-    const [response, setResponse] = useState(false)
-    const [clock, setClock] = useState(0)
-    const [camera, setCamera] = useState(true)
-    const [speaker, setSpeaker] = useState(true)
-    const [micro, setMicro] = useState(true)
-
-    const navigation = useNavigation()
-    
-    useEffect(() =>{
-        setTimeout(()=> {setResponse(true)}, 5000)
-    }, [])
+})/*
+let localStream = MediaStream | null;
+let remoteStream = MediaStream | null;
+*/
+export default function VideoChat({localStream, remoteStream, hangup}) {
+  if (localStream && !remoteStream) {
     return (
-        <>
-        <StatusBar style='transparent' /> 
-        <View  style={{flex: 1, backgroundColor: "white", justifyContent:'center', alignItems: 'center',}}>
-            {!response ? (<>
-                    <FriendsAvatar Img={!user.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : user.photoURL}
-                    Width={150}
-                    Height={150}
-                    ></FriendsAvatar>
-                    <Text style={{fontWeight: 'bold', fontSize: 35, marginTop: 25}}>{user.displayName}</Text>
-                    <Text style={{ marginTop: 10}}>Đang gọi...</Text>
-                </>) : 
-                (<>
-                    <ImageBackground  source={! user.photoURL ? require('../../assets/user_no_avatar.jpg') : {uri: user.photoURL, cache: 'force-cache'}} style={{width: "100%", height: "100%"}} >
-                        <Image source={!auth.currentUser.photoURL ? require('../../assets/user_no_avatar.jpg') : {uri: auth.currentUser.photoURL, cache: 'force-cache'}} style={{borderRadius: 10, width: "30%", height: "30%", top: 100, left: Dimensions.get('window').width * 0.6}} />
-                    </ImageBackground>
-                    
-                </>)}
+      <View style={styles.bContainer}>
+        <RTCView
+          streamURL={localStream.toURL()}
+          objectFit="cover"
+          style={styles.video} 
+        >
+        </RTCView>
+        <View style={styles.bContainer}>
+          <TouchableOpacity style={[styles.icon]} onPress={hangup}>
+            <AntDesign name="close" size={35} color="white"  style={[{backgroundColor: "#FF5757"}, styles.icon_opa]} />
+          </TouchableOpacity>
         </View>
-        <View style={{flexDirection: 'row', bottom: Dimensions.get('window').height * 0.0, backgroundColor: 'white', justifyContent: 'center', alignContent: 'center', paddingBottom: 10, paddingTop: 10}} >
-                <TouchableOpacity style={styles.icon}  onPress={() => {setCamera(!camera)}}>
-                    <Feather name={camera ? "camera" : "camera-off"} size={35} color="white"  style={!camera ? [{backgroundColor: "grey"},  styles.icon_opa] : [styles.speaker, styles.icon_opa]  }/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.icon}  onPress={() => {setSpeaker(!speaker)}}>
-                    <AntDesign name="sound" size={35} color="white"  style={!speaker ? [{backgroundColor: "grey"},  styles.icon_opa] : [styles.speaker, styles.icon_opa]  }/>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.icon} onPress={() => {setMicro(!micro)}}>
-                    <Feather name={micro ? "mic" : "mic-off"} size={35} color="white"  style={!micro ? [{backgroundColor: "grey"},  styles.icon_opa] : [styles.speaker, styles.icon_opa]  }/>
-                </TouchableOpacity >
-                <TouchableOpacity style={styles.icon} onPress={() => {navigation.goBack()}}>
-                    <AntDesign name="close" size={35} color="white"  style={[styles.close, styles.icon_opa]} />
-                </TouchableOpacity>
-            </View>
-        </>
+      </View>
     )
+  }
+  if (localStream && remoteStream) {
+    return (
+      <View style={styles.bContainer}>
+        <RTCView
+          streamURL={remoteStream.toURL()}
+          objectFit="cover"
+          style={styles.video} 
+        >
+        </RTCView>
+        <RTCView
+          streamURL={localStream.toURL()}
+          objectFit="cover"
+          style={styles.videoLocal} 
+        >
+        </RTCView>
+        <View style={styles.bContainer}>
+          <TouchableOpacity style={[styles.icon]}  onPress={hangup}>
+            <AntDesign name="close" size={35} color="white"  style={[{backgroundColor: "#FF5757"}, styles.icon_opa]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
+  return (
+    <View style={styles.bContainer}>
+      <TouchableOpacity style={[styles.icon]}  onPress={hangup}>
+        <AntDesign name="close" size={35} color="white"  style={[{backgroundColor: "#FF5757"}, styles.icon_opa]} />
+      </TouchableOpacity>
+    </View>
+  )
 }

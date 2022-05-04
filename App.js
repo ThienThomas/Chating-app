@@ -1,9 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
-import React, {Children, useContext, useEffect, useState} from 'react';
+import React, {Children, useContext, useEffect, useRef, useState} from 'react';
 import { StyleSheet, Text, View, LogBox } from 'react-native';
 import { useAssets } from "expo-asset";
 import { onAuthStateChanged} from "firebase/auth"
-import { auth } from "./firebase"
+import { auth, db } from "./firebase"
 import { NavigationContainer, useNavigation} from "@react-navigation/native"
 import { createStackNavigator}  from "@react-navigation/stack"
 import SignIn from './screens/Authentication/SignIn';
@@ -51,17 +51,104 @@ import CreateGroup from './screens/Chat/CreateGroupChat';
 import CreateGroupInfo from './screens/Chat/CreateGroupInfo';
 import ChangeEmail from './screens/Authentication/ChangeEmail';
 import ReCredential from './screens/Authentication/ReCredential';
+import TakePhoto from './screens/Chat/Function/TakePhoto';
+import PickPhoto from './screens/Chat/Function/PickPhoto';
+import PickVideo from './screens/Chat/Function/PickVideo';
+import PickDoc from './screens/Chat/Function/PickDoc';
+import GettingVideoCall from './screens/Call/GettingVideoCall';
+import MakingVideoCall from './screens/Call/MakingVideoCall';
+import ChatInfo from './screens/Chat/ChatInfo';
+import Sharing from './screens/Chat/Sharing';
+import ChatInGroup from './screens/Chat/ChatInGroup';
+import PickPhotoGroup from './screens/Chat/Function/PickPhotoGroup';
+import PickVideoGroup from './screens/Chat/Function/PickVideoGroup';
+import PickDocGroup from './screens/Chat/Function/PickDocGroup';
+import ChatInfoGroup from './screens/Chat/ChatInfoGroup';
+import SharingGroup from './screens/Chat/SharingGroup';
+//
+/*
+import { RTCPeerConnection } from 'react-native-webrtc';
+import Utils from './screens/Call/Utils';
+import { MediaStream, EventOnAddStream, RTCIceCandidate } from 'react-native-webrtc';
+ 
+  import { collection, doc, onSnapshot, } from 'firebase/firestore';*/
+//
 const Stack = createStackNavigator()
 const Tab = createBottomTabNavigator()
 LogBox.ignoreLogs([
   "Setting a timer",
   "AsyncStorage ...."
 ])
-
+//const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
 function App() {
   const [currUser, setCurrUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  //
+  /*const [localStream, setLocalStream] = useState(MediaStream | null);
+  const [remoteStream, setRemoteStream] = useState(MediaStream | null);
+  const [gettingCall, setGettingCall] = useState(false)
+  const pc = useRef(RTCPeerConnection);
+  const connecting = useRef(false);
+  const setupWebrtc = async () => {
+    pc.current = new RTCPeerConnection(configuration)
+    const stream = await Utils.getStream()
+    if(stream) {
+      setLocalStream(stream);
+      pc.current.addStream(stream);
+    }
+    pc.current.onaddstream = (event) => {
+      setRemoteStream(event.stream)
+    }
 
+  }
+  const create =  async () => {
+    console.log("Calling")
+    connecting.current = true;
+    await setupWebrtc();
+    const cRef = doc(db, "meet", "chatId" )
+    collectIceCandidates(cRef, "caller", "callee")
+    if (pc.current){
+      const offer = await pc.current.createOffer();
+      pc.current.setLocalDescription(offer);
+      const cWithOffer = {
+        offer: {
+          type: offer.type,
+          sdp: offer.sdp,
+        },
+      }
+      cRef.set(cWithOffer)
+    }
+  };
+  const join = async () => {};
+  const hangup = async() => {}
+  const collectIceCandidates = async (cRef, localName, remoteName) => {
+    const candidateCollection = collection(cRef, localName);
+    if (pc.current) {
+      pc.current.onicecandidate = (event) => {
+        if (event.candidate) {
+          candidateCollection.add(event.candidate);
+        }
+      }
+    }
+    onSnapshot(cRef, (Snapshot) => {
+      Snapshot.docChanges().forEach((change) => {
+        if (change.type === 'added'){
+          const candidate = new RTCIceCandidate(change.doc.data())
+          pc.current.addIceCandidate(candidate)
+        }
+      })
+    })
+  }
+  
+  if (gettingCall) {
+    return <GettingVideoCall hangup={hangup} join={join}></GettingVideoCall>
+  }
+  if (localStream){
+    return <VideoChat hangup={hangup} localStream={localStream} remoteStream={remoteStream}></VideoChat>
+
+  }
+ */
+ //
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setLoading(false);
@@ -156,7 +243,7 @@ function App() {
                     width: 50
                   },
                   headerTitle: () => (
-                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}} onPress={() => navigation.navigate('friendinfo', {user:route.params.user, seen: route.params.seen,  By: route.params.By})}>
+                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}} onPress={() => navigation.navigate('friendinfo', {user:route.params.user})}>
                     <FriendsAvatar
                         Img={!route.params.user.photoURL === "none" ? require('./assets/user_no_avatar.jpg') : route.params.user.photoURL}
                         Width={40}
@@ -175,11 +262,50 @@ function App() {
                       <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={() => { navigation.navigate('voicecall', {user:route.params.user})}}>
                         <FontAwesome name="phone" size={26} color="#42C2FF" />
                       </TouchableOpacity >
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={() => { navigation.navigate('videochat', {user:route.params.user})}}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}} onPress={() => { navigation.navigate('makingvideocall', {user:route.params.user})}}>
                         <FontAwesome name="video-camera" size={26} color="#42C2FF" />                      
                         </TouchableOpacity >
-                      <TouchableOpacity style={{marginLeft: 10, marginRight: 15}}>
-                      <MaterialIcons name="settings" size={26} color="#42C2FF" />
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 15}} onPress={() => { navigation.navigate('chatinfo', {user:route.params.user})}}>
+                      <MaterialIcons name="info" size={26} color="#42C2FF" />
+                        </TouchableOpacity>
+                    </View>
+                    ),
+                  })}
+                />
+            </Stack.Group>
+            <Stack.Group>
+            <Stack.Screen screenOptions={{presentation: 'modal'}}
+                name="chatingroup" 
+                component={ChatInGroup} 
+                options={({route, navigation}) => ({
+                  headerBackTitle: <>
+                    <Feather name="chevron-left" size={35} color="#42C2FF" />
+                  </>,
+                  headerLeftLabelVisible: true,
+                  headerLeftContainerStyle: {
+                    width: 50
+                  },
+                  headerTitle: () => (
+                    <TouchableOpacity style={{flexDirection: 'row',alignItems: 'center',}}>
+                    
+                    <Text style={{marginLeft: 10, fontWeight: 'bold', fontSize: 15, }}></Text>
+                    </TouchableOpacity>
+                   ),
+                  headerTitleContainerStyle: {
+                    marginLeft: 0
+                  },
+                  headerBackTitleVisible: true,
+                  headerBackImage: () => (<></>),
+                  headerRight: () => (
+                    <View style={{flexDirection: 'row',alignItems: 'center', justifyContent: 'center'}}>
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}>
+                        <FontAwesome name="phone" size={26} color="#42C2FF" />
+                      </TouchableOpacity >
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 10}}>
+                        <FontAwesome name="video-camera" size={26} color="#42C2FF" />                      
+                        </TouchableOpacity >
+                      <TouchableOpacity style={{marginLeft: 10, marginRight: 15}}  onPress={() => { navigation.navigate('chatinfogroup', {group_item: route.params.group_item})}}>
+                      <MaterialIcons name="info" size={26} color="#42C2FF" />
                         </TouchableOpacity>
                     </View>
                     ),
@@ -192,8 +318,8 @@ function App() {
                 component={VoiceCall} 
               />
               <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
-                name="videochat" 
-                component={VideoChat} 
+                name="makingvideocall" 
+                component={MakingVideoCall} 
               />
             </Stack.Group>
             <Stack.Group screenOptions={{presentation: 'modal', headerShown: false}}>
@@ -262,9 +388,9 @@ function App() {
                 }}
               />
             </Stack.Group>
-            <Stack.Group screenOptions={{presentation: 'modal', headerTitle: "Tạo nhóm", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown: false, headerTitle: "Tạo nhóm", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
                 <Stack.Screen name="creategroup" component={CreateGroup}
-                  options={({navigation}) => ({
+                  options={({route, navigation}) => ({
                     headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
                     headerBackTitleVisible: true,
                     headerBackTitleStyle: {
@@ -272,7 +398,7 @@ function App() {
                   },
                   headerBackImage: () => {""},
                   headerRight: () => (
-                    <TouchableOpacity style={{marginRight: 15}} onPress={ () => { navigation.navigate('creategroupinfo') }}>
+                    <TouchableOpacity style={{marginRight: 15}} onPress={ () => { navigation.navigate('creategroupinfo')}}>
                       <Text style={{fontWeight: 'bold', color: '#42C2FF'}}>Tiếp tục</Text>
                     </TouchableOpacity>
                   )
@@ -292,6 +418,123 @@ function App() {
                   },
                   headerBackImage: () => {""},
                 }}
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'card', headerShown : false}}>
+            <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="takephoto" 
+                component={TakePhoto} 
+              />
+
+            </Stack.Group>  
+            <Stack.Group screenOptions={{presentation: 'card', headerShown : false}}>
+            
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="pickphoto" 
+                component={PickPhoto} 
+              />
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="pickphotogroup" 
+                component={PickPhotoGroup} 
+              />
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="pickvideo" 
+                component={PickVideo} 
+              />
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="pickvideogroup" 
+                component={PickVideoGroup} 
+              />
+               
+            </Stack.Group>  
+            <Stack.Group screenOptions={{presentation: 'card', headerTitle: "Tệp đính kèm", headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+            <Stack.Screen 
+               options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                }}
+                name="pickdoc" 
+                component={PickDoc} 
+              />
+              <Stack.Screen 
+               options={{
+                    headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                    headerBackTitleVisible: true,
+                    headerBackTitleStyle: {
+                    color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                }}
+                name="pickdocgroup" 
+                component={PickDocGroup} 
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown : false}}>
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="gettingvideochat" 
+                component={GettingVideoCall} 
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerShown : false}}>
+              <Stack.Screen screenOptions={{presentation: 'modal', headerShown : false, headerTitleStyle:{color: 'transparent'}}}
+                name="videochat" 
+                component={VideoChat} 
+              />
+            </Stack.Group>
+            <Stack.Group>
+              <Stack.Screen 
+                name='chatinfo'
+                component={ChatInfo}
+                options={{
+                  headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                  color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  }}
+              />
+              <Stack.Screen 
+                name='chatinfogroup'
+                component={ChatInfoGroup}
+                options={{
+                  headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                  color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  }}
+              />
+            </Stack.Group>
+            <Stack.Group screenOptions={{presentation: 'modal', headerTitle:"Nội dung đã chia sẻ",  headerTitleAlign: 'center', headerTitleStyle: {fontSize: 18, color: 'black'}}}>
+              <Stack.Screen 
+                name="sharing" 
+                component={Sharing} 
+                options={ ({route}) => ({
+                  headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                  color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  })}
+              />
+              <Stack.Screen 
+                name="sharinggroup" 
+                component={SharingGroup} 
+                options={ ({route}) => ({
+                  headerBackTitle: <Feather name="chevron-left" size={35} color="black" />,
+                  headerBackTitleVisible: true,
+                  headerBackTitleStyle: {
+                  color: 'black'
+                  },
+                  headerBackImage: () => {""},
+                  })}
               />
             </Stack.Group>
             </>

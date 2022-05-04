@@ -20,6 +20,7 @@ const UseGlobalContext = ({children}) => {
     const [listFriends, setListFriends] = useState([])
     const [listChats, setListChats] = useState([])
     const [isBusy, setIsBusy] = useState(true)
+    const [listGroupChat, setListGroupChat] = useState([])
     //const [masterDataSource, setMasterDataSource] = useState([])
     async function getdocfromServer() {
         const colRef = query(collection(db, "users"), where("uid", "!=", auth.currentUser.uid))
@@ -89,7 +90,34 @@ const UseGlobalContext = ({children}) => {
             return () =>  unsubscribe()
         }
     })
+    useState(() => {
+        if (auth.currentUser){
+            setIsBusy(true)
+            const q = query(collection(db, "chatgroups"), where("participants", 'array-contains', auth.currentUser.uid))
+            onSnapshot(q, (querySnapshot) => {
+                let rooms = []
+                querySnapshot.forEach((doc) => {
+                    let room = doc.data()
+                    room.roomid = doc.id;
+                    rooms.push(room)
+                    
+                })
+                rooms.sort((a, b) => {
+                    return b.lastmessage.createdAt - a.lastmessage.createdAt
+                })
 
+                setListGroupChat(rooms)
+                /*querySnapshot.docChanges().forEach((change) => {
+                    if (change.type === "modified") {
+                        console.log(change.doc.data())
+                        //NotificationsOfNewmess()
+                    }
+                })*/
+            })
+            setIsBusy(false)
+            return () => unsubscribe()
+        }
+    })
     useState(() => {
         if (auth.currentUser){
             setIsBusy(true)
@@ -156,6 +184,7 @@ const UseGlobalContext = ({children}) => {
                 isBusy,
                 sendingRequest,
                 receivedRequest,
+                listGroupChat
             }}
         >
             {children}

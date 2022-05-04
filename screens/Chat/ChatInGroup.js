@@ -30,6 +30,7 @@ import ConvertExtension from './Function/ConvertExtension';
 import SwipeUpDownModal from 'react-native-swipe-modal-up-down';
 import RecordAudio from './Function/RecordAudio';
 import FetchingGif from './Function/FetchingGif';
+import FetchingGifGroup from './Function/FetchingGifGroup';
 
 const styles = StyleSheet.create({
   containerContent: {height: 100, marginTop: 40},
@@ -62,11 +63,9 @@ const styles = StyleSheet.create({
   },
 });
 //const video = Video
-export default function Chat({route, navigation}){
-    const VideoRef = React.useRef(null)
-    const { user } = route.params;
-    const { seen } = route.params;
-    const { By } = route.params;
+export default function ChatInGroup({route, navigation}){
+    const { group_item, users } = route.params;
+    //console.log(users)
     const [mess, setMess] = useState('')
     const [messages, setMessages] = useState([]);
     //const [emojiSelected, setEmojiSelected] = useState('');
@@ -77,22 +76,18 @@ export default function Chat({route, navigation}){
     const [modalRecordingAnimation, setModalRecordingAnimation] = useState(false);
     const [modalGif, setModalGif] = useState(false)
     const [modalGifAnimation, setModalGifAnimation] = useState(false);
-
-    const docid = user.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + user.uid : user.uid + "-" + auth.currentUser.uid
+    const [avatarList, setAvatarList] = useState([]);
+    const docid = group_item.roomid
     const getAllMessages = async () => {
-      const docid = user.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + user.uid : user.uid + "-" + auth.currentUser.uid
-      if (By !== auth.currentUser.uid){
-        const cRef = doc(db,"chatrooms", docid)
-        await updateDoc(cRef, {seen: true}).then(() => {console.log('seen already')})
-      }
-      const Query = query(collection(db,"chatrooms", docid, "messages"), orderBy("createdAt", 'desc'))
-      const unsubscribe1 = onSnapshot(Query, (querySnapshot) => {
+      //const docid = user.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + user.uid : user.uid + "-" + auth.currentUser.uid
+    const Query = query(collection(db,"chatgroups", docid, "messages"), orderBy("createdAt", 'desc'))
+    const unsubscribe1 = onSnapshot(Query, (querySnapshot) => {
         try{
         let allmsg = querySnapshot.docs.map(
-          message => {
-            return {
-              ...message.data(),
-              createdAt: message.data().createdAt.toDate()
+            message => {
+                return {
+                ...message.data(),
+                createdAt: message.data().createdAt.toDate()
             }
           }
         )
@@ -104,7 +99,7 @@ export default function Chat({route, navigation}){
       })
     }
     useEffect(() => {
-      return  getAllMessages()
+        return getAllMessages()
     }, [])
     useEffect(() => {
       const KeyboardDidShowListenner = Keyboard.addListener('keyboardDidShow', () => {setIsOpen(false)})
@@ -119,21 +114,21 @@ export default function Chat({route, navigation}){
         const mymsg = {
             ...msg,
             sentBy: auth.currentUser.uid,
-            sendTo: user.uid,
+            //sendTo: user.uid,
             createdAt: new Date(),
             type: "text"
         }
         setMessages(previousMessages => GiftedChat.append(previousMessages, mymsg))
         //const docid = user.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + user.uid : user.uid + "-" + auth.currentUser.uid
-        setDoc(doc(db, 'chatrooms', docid), {
+        updateDoc(doc(db, 'chatgroups', docid), {
           draf: [],
           lastmessage: {
             ...mymsg
           },
-          participants: [user.uid, auth.currentUser.uid],
-          seen: false
+          //participants: [user.uid, auth.currentUser.uid],
+          //seen: false
         })
-        const docRef = doc(db, 'chatrooms', docid);
+        const docRef = doc(db, 'chatgroups', docid);
         const colRef = collection(docRef, "messages");
         addDoc(colRef, {
           ...mymsg,
@@ -146,22 +141,14 @@ export default function Chat({route, navigation}){
           docs: [],
         })*/
       })
-    const avatar = () => {
-      return (
-      <FriendsAvatar
-       Img={!user.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : user.photoURL}
-        Width={36}
-       Height={36} 
-      />
-      )
-    }
+      
     async function UploadMyImage(result) {
       const {url, fileName} = await uploadImage(result, `chatrooms/${docid}`)
       const message = {
         _id: fileName, 
         text: "",
         sentBy: auth.currentUser.uid,
-        sendTo: user.uid,
+        //sendTo: user.uid,
         createdAt: new Date(),
         image: url,
         user : {
@@ -174,8 +161,8 @@ export default function Chat({route, navigation}){
         lastmessage: {
           ...message
         },
-        participants: [user.uid, auth.currentUser.uid],
-        seen: false
+        //participants: [user.uid, auth.currentUser.uid],
+        //seen: false
       })
       const docRef = doc(db, 'chatrooms', docid);
       const colRef = collection(docRef, "messages");
@@ -186,31 +173,32 @@ export default function Chat({route, navigation}){
     }
     async function handleProfilePicture(val){
           if (val === 1){
-              const result = await ImagePicker.launchCameraAsync();
-              if (!result.cancelled){
-                  await UploadMyImage(result.uri)
-              }
-          }
-          else if (val === 2){
-              const result = await ImagePicker.launchImageLibraryAsync({mediaTypes: ImagePicker.MediaTypeOptions.All, videoMaxDuration: 60, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low});
-              if (!result.cancelled){
-                if (result.type == 'image') {
-                  navigation.navigate('pickphoto', {image: result, user: user, docid: docid})
+                const result = await ImagePicker.launchCameraAsync();
+                if (!result.cancelled){
+                    await UploadMyImage(result.uri)
                 }
-                else {
-                  navigation.navigate('pickvideo', {video: result, user: user, docid: docid})
+            }
+            else if (val === 2){
+                const result = await ImagePicker.launchImageLibraryAsync({mediaTypes: ImagePicker.MediaTypeOptions.All, videoMaxDuration: 60, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Low});
+                if (!result.cancelled){
+                    if (result.type == 'image') {
+                    navigation.navigate('pickphotogroup', {image: result,  docid: docid})
+                    }
+                    else {
+                    navigation.navigate('pickvideogroup', {video: result, docid: docid})
                 }
-          } 
-      }
+            } 
+        }
     }
     async function handleDocumentPicker(){
       //let result = []
+      
       const result = await DocumentPicker.getDocumentAsync({type: 'application/*', multiple: true, copyToCacheDirectory: true})
       if (result.type === 'success'){
         let extension = result.uri.substring(result.uri.lastIndexOf('.') + 1);
         let converted_extension = ConvertExtension(extension)
         if (converted_extension !== 'not_support') {
-          navigation.navigate('pickdoc', {document: result, user: user, docid: docid, ext: converted_extension})
+          navigation.navigate('pickdocgroup', {document: result, docid: docid, ext: converted_extension})
         }
         else {
           Alert.alert('Có lỗi xảy ra', 'Định dạng file không được hỗ trợ !', [
@@ -305,9 +293,7 @@ export default function Chat({route, navigation}){
                         height:   Dimensions.get('window').width * 0.45,
                         borderRadius: 20,
                         margin: 1
-                        
                       }}
-                      
                       >
                     </Video>
                   </View>
@@ -321,7 +307,6 @@ export default function Chat({route, navigation}){
                   height:   Dimensions.get('window').width * 0.45,
                   borderRadius: 20,
                   margin: 1
-                  
                 }}>
                   <Video 
                     resizeMode='cover'
@@ -335,13 +320,9 @@ export default function Chat({route, navigation}){
                       height:   Dimensions.get('window').width * 0.45,
                       borderRadius: 20,
                       margin: 1
-                      
                     }}
-                    
                     >
-
                   </Video>
-                  
                 </View>
               )
             }}
@@ -406,13 +387,22 @@ export default function Chat({route, navigation}){
                   borderColor: "#eeeeee"
                 }
               }}
-              
             />}
             minInputToolbarHeight={55}
             locale={vi}
             showAvatarForEveryMessage={false}
             placeholder="Aa"
-            renderAvatar={avatar}
+            renderAvatar={(props) => {
+                let item = users.find(element => element.uid === props.currentMessage.user._id)
+                //console.log(item.photoURL);
+                return ( 
+                    <FriendsAvatar
+                        Img={!item.photoURL === "none" ? require('../../assets/user_no_avatar.jpg') : item.photoURL}
+                        Width={36}
+                        Height={36} 
+                    />
+                )
+            }}
             messages={messages}
             onSend={onSend}
             user={{
@@ -459,7 +449,8 @@ export default function Chat({route, navigation}){
                 
                 optionTintColor="black"
                 options={{
-                  ['Máy ảnh']:  async () => { Camera.requestCameraPermissionsAsync(); navigation.navigate('takephoto', {user: user, docid: docid})},
+                  ['Máy ảnh']:  async () => { //Camera.requestCameraPermissionsAsync(); navigation.navigate('takephoto', {user: user, docid: docid})
+                    },
                   ['Video'] : () => {handleProfilePicture(3)},
                   ['Thư viện']: () => {handleProfilePicture(2)}
                 }}  
@@ -514,13 +505,11 @@ export default function Chat({route, navigation}){
             categoryPosition="bottom"
          />) : <></>}
           <SwipeUpDownModal
-          
            modalVisible={modalRecordingVisible}
            PressToanimate={modalRecordingAnimation}
            ContentModal={
             <>
               <View style={{height:7, width: 75, backgroundColor: '#d1d1d1', borderRadius: 10, alignSelf:'center'}}></View>  
-              <RecordAudio docid={docid} user={user}></RecordAudio>
             </>   
            }
            HeaderStyle={{
@@ -542,7 +531,7 @@ export default function Chat({route, navigation}){
            ContentModal={
             <>
               <View style={{height:7, width: 75, backgroundColor: '#d1d1d1', borderRadius: 10, alignSelf:'center'}}></View>  
-              <FetchingGif docid={docid} user={user}></FetchingGif>
+              <FetchingGifGroup docid={docid}></FetchingGifGroup>
             </>   
            }
            HeaderStyle={{

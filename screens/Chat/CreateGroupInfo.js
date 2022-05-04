@@ -8,7 +8,7 @@ import * as ImagePicker from 'expo-image-picker'
 import { app, auth, db, storage} from "../../firebase";
 import { uploadImage } from "../../utils";
 import { updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, doc, setDoc, updateDoc } from "firebase/firestore";
 import { getDownloadURL, uploadBytes} from "firebase/storage";
 import { cacheImages, _loadAssetsAsync } from "../../AssetsCaching";
 import { getDatabase, ref,  onValue, set } from "firebase/database";
@@ -16,6 +16,7 @@ import { async } from "@firebase/util";
 import { AppLoadingAnimation } from "../../elements/AppLoadingAnimation";
 import { useNavigation } from "@react-navigation/native";
 import { GlobalContext, UseGlobalContext } from "../../GlobalContext";
+import { nanoid } from "nanoid";
 const styles = StyleSheet.create({
     centeredView: {
       flex: 1,
@@ -110,14 +111,16 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     }
   });
-export default function CreateGroupInfo() {
+export default function CreateGroupInfo({route}) {
+    const users = route.params.users
+    console.log("=>", users)
     return (
         <UseGlobalContext>
-            <GroupInfo />
+            <GroupInfo users={users} />
         </UseGlobalContext>
     )
 }
-function GroupInfo(){
+function GroupInfo({users}){
     const [displayName, setDisplayName] = useState("")
     const [selectedImage, setSelectedImage] = useState(null)
     const [modalVisible, setModalVisible] = useState(false);
@@ -161,6 +164,62 @@ function GroupInfo(){
             }
         }
         else requestCameraPermission();
+    }
+    async function CreateGroupInformation(){
+        const groupId = nanoid();
+        //let PromiseArray = [];
+        const Users = users
+        Users.push(auth.currentUser.uid)
+        let url1 = "none"
+        let fileName1 = ""
+        if (selectedImage){
+            const {url, fileName} = await uploadImage(selectedImage,  `chatgroups/${groupId}/avatar/`, "groupavatar")
+            url1 = url;
+            fileName1 = fileName;
+        }
+        await Promise.all(users.map(async (child) => {
+            //console.log("===>", child)
+            updateDoc(doc(db, "users", child), {
+                groupchats: arrayUnion(groupId)
+            })
+        }))
+        const message = {
+            _id: nanoid(),
+            text: 'Các bạn đang kết nối trên Exping',
+            system: true,
+            createdAt: new Date(),
+            
+        }
+        setDoc(doc(db, 'chatgroups', groupId),{
+            draf: [],
+            lastmessage: {
+              ...message
+            },
+            //users: item.uid > auth.currentUser.uid ? [auth.currentUser.uid, item.uid] : [item.uid, auth.currentUser.uid],
+            participants: Users,
+            avatar: url1,
+            name: displayName,
+          })
+        const colRef = collection(doc(db, 'chatgroups', groupId), "messages");
+        addDoc(colRef, {
+            ...message
+        })
+        const colRef2 = collection(doc(db, 'chatgroups', groupId), "videocall");
+        addDoc(colRef2, {
+            Initvideo: []
+          })
+        //console.log(selectedImage.uri)
+        
+        const colRef3 = collection(doc(db, 'chatgroups', groupId), "groupinfo"); 
+        addDoc(colRef3, {
+            avatar: url1,
+            name: displayName,
+            participants: users,
+            admin: auth.currentUser.uid
+        })
+        Alert.alert('Thành công !', 'Tạo nhóm thành công!', [
+            { text: 'OK', onPress: () => navigation.navigate('home') },
+        ]);
     }
     return (
         <>
@@ -245,9 +304,10 @@ function GroupInfo(){
                  }}>
                 <Pressable  
                     onPress={() => {
-                        Alert.alert('Thành công !', 'Về nhà nào !', [
+                        CreateGroupInformation()
+                        /*Alert.alert('Thành công !', 'Tạo nhóm thành công!', [
                             { text: 'OK', onPress: () => navigation.navigate('home') },
-                        ]);
+                        ]);*/
                     }}
                     disabled={!displayName}
                     style={styles.nextbtn}>  

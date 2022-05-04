@@ -34,6 +34,116 @@ export async function uploadImage(uri, path, fName) {
 
   return { url, fileName };
 }
+export async function uploadgif(uri, path, fName) {
+  // Why are we using XMLHttpRequest? See:
+  // https://github.com/expo/expo/issues/2402#issuecomment-443726662
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      reject(new TypeError("Network request failed"));
+      console.log("Network request failed");
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+
+  const fileName = fName || nanoid();
+  const imageRef = ref(storage, `${path}/${fileName}.gif`);
+
+  const snapshot = await uploadBytes(imageRef, blob, {
+    contentType: "image/gif",
+  });
+
+  blob.close();
+
+  const url = await getDownloadURL(snapshot.ref);
+
+  return { url, fileName };
+}
+export async function uploadVideo(uri, path, fName) {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      reject(new TypeError("Network request failed"));
+      console.log("Network request failed");
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+
+  const fileName = fName || nanoid();
+  const imageRef = ref(storage, `${path}/${fileName}.mp4`);
+
+  const snapshot = await uploadBytes(imageRef, blob, {
+    contentType: "video/mp4",
+  });
+
+  blob.close();
+
+  const url = await getDownloadURL(snapshot.ref);
+
+  return { url, fileName };
+}
+export async function uploadDocuments(uri, path, typedoc, fName) {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      reject(new TypeError("Network request failed"));
+      console.log("Network request failed");
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+
+  const fileName = fName || nanoid();
+  const imageRef = ref(storage, `${path}/${fileName}`);
+
+  const snapshot = await uploadBytes(imageRef, blob, {
+    contentType: `application/${typedoc}`,
+  });
+
+  blob.close();
+
+  const url = await getDownloadURL(snapshot.ref);
+
+  return { url, fileName };
+}
+export async function uploadAudio(uri, path, fName) {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      reject(new TypeError("Network request failed"));
+      console.log("Network request failed");
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+  const fileName = fName || nanoid();
+  const imageRef = ref(storage, `${path}/${fileName}.mp3`);
+  const snapshot = await uploadBytes(imageRef, blob, {
+    contentType: "audio/mp3",
+  });
+  blob.close();
+  const url = await getDownloadURL(snapshot.ref);
+  return { url, fileName };
+}
+
 const palette = {
     tealGreen: "#128c7e",
     blue: "#42C2FF",

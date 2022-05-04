@@ -15,11 +15,27 @@ import { Dimensions } from "react-native";
 import { Feather, FontAwesome} from '@expo/vector-icons';
 import { KeyboardAvoidingView } from "react-native";
 import { async } from "@firebase/util";
-
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+const Tab = createMaterialTopTabNavigator()
 export default function Chats(){
   return (
     <UseGlobalContext>
-      <ListChats></ListChats>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarIndicatorStyle: {backgroundColor: "#42C2FF"}
+        }}
+      >
+        <Tab.Screen
+          component={ListChats}
+          name="Bạn bè"
+        >
+        </Tab.Screen>
+        <Tab.Screen
+          component={GroupChats}
+          name="Nhóm"
+        >
+        </Tab.Screen>
+      </Tab.Navigator>
     </UseGlobalContext>
   )
 }
@@ -33,99 +49,7 @@ function ListChats(){
     const [listRooms, setListRooms] = useState([])
     const navigation = useNavigation()
     const [isBusy, setIsBusy] = useState(true)
-    /*console.log(masterDataSource)
-    console.log(listChats)
-    console.log(listFriends)
-    console.log(listRooms)*/
-    /*useEffect(() => {
-      if (globalContext.isBusy === false){
-        setMasterDataSource(globalContext.masterData)
-        setIsBusy(false)
-        console.log("chat", "=>", masterDataSource)
-      }
-      else {
-        setIsBusy(true)
-      }
-    }, [])*/
-    /*useEffect(() => {
-      setIsBusy(true)
-      const unsubscribe = async  () => {
-      try{
-        const colRef = query(collection(db, "users"), where("uid", "!=", auth.currentUser.uid))
-        let Docs = await getDocsFromServer(colRef)
-        Docs.docs.map((doc) => {
-          console.log(doc.data());
-        })
-        
-      }catch(error) {
-        console.log(error)
-      }
-      setIsBusy(false)
-    }
-    return () => unsubscribe()
-    },[])*/
-    /*useEffect(() => {
-       setIsBusy(true)
-       console.log(masterDataSource)
-        const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
-          let listF = [];
-          let listC = [];
-          querySnapshot.forEach((doc) => {
-            listF = doc.data().listfriends
-            listC = doc.data().listchats
-          })
-          setListFriends(listF)
-          setListChats(listC)
-        })
-        setIsBusy(false)
-        return () => unsubscribe()
-      }, []);*/
-    /*useEffect(() => {
-      const q1 = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
-      const unsubscribe = onSnapshot(q1, (querySnapshot) => {
-        let listC = [];
-        querySnapshot.forEach((doc) => {
-          listC = doc.data().listchats
-        })
-        if (listC.length !== 0) {
-          let listMess = []
-          console.log(listC)
-          listC.forEach(async (value) => {
-            console.log(value)
-            const getdoc = await getDoc(db, "chatrooms", value)
-            console.log(getdoc.data())
-          })
-        }
-      })
-      return () => unsubscribe()
-     })*/
-     /*useEffect(() => {
-      setIsBusy(true)
-      if (masterDataSource.length !== 0) {
-        console.log(1)
-        const q1 = query(collection(db, "chatrooms"), where("participants", 'array-contains', auth.currentUser.uid))
-        const unsubscribe = onSnapshot(q1, (querySnapshot) => {
-        const rooms = [];
-        querySnapshot.docs.map((doc) => {
-          let room = doc.data()
-          //console.log(room)
-          const userinroom = masterDataSource.find(element => element.uid == room.lastmessage.sentBy || element.uid == room.lastmessage.sendTo)
-          room.photoURL = userinroom.photoURL
-          room.displayName = userinroom.displayName
-          room.uid = userinroom.uid
-          //console.log(room)
-          //console.log(userinroom.photoURL)
-          rooms.push(room)
-        })
-        //console.log(rooms)
-        setListRooms(rooms)
-        setIsBusy(false)
-        })
-        return () => unsubscribe()
-      }
-     }, [])*/
-  
+    
       const searchFilterFunction = (text) => {
         if (text) {
           const newData = listRooms.filter(function (item) {
@@ -187,8 +111,18 @@ function ListChats(){
                 <Text style={{
                   fontWeight: !item.seen && item.lastmessage.sendTo === auth.currentUser.uid ? 'bold' : 'normal'
                 }}>
+                  {item.lastmessage.system ? (<>{item.lastmessage.text}</>):(<>
+                    {item.lastmessage.sentBy != auth.currentUser.uid ? null : "Bạn: "}{item.lastmessage.type === "text" ? item.lastmessage.text : (<>
+                    {item.lastmessage.type === "video" ? "Video" : (<>
+                      {item.lastmessage.type === "image" ? "Hình ảnh" : <>
+                        {item.lastmessage.type === "document" ? "Đã gửi một tệp đính kèm" : (<>
+                          {item.lastmessage.type === "audio" ? "Đã gửi một clip thoại" : (<>
+                            {item.lastmessage.type === "gif" ? "GIF" : <></>}</>)}
+                        </>)}</>}
+                    </>)}
+                  </>)} 
+                  </>)}
                   
-                  {item.lastmessage.sentBy != auth.currentUser.uid ? null : "Bạn: "}{item.lastmessage.text !== "" ? item.lastmessage.text : "Hình ảnh"} 
                 </Text>
                   <View style={{justifyContent:'center'}}>
                   {!item.seen && item.lastmessage.sentBy !== auth.currentUser.uid ? <View style={{width: 10 ,height: 10, backgroundColor:'#42C2FF', borderRadius: 20}}></View> :<></>} 
@@ -245,4 +179,143 @@ function ListChats(){
         {!globalContext.isPending ?  null : <AppLoadingAnimation />}
         </>
     )
+}
+
+function GroupChats() {
+  const globalContext = useContext(GlobalContext);
+  const [search, setSearch] = useState('');
+  const [filteredDataSource, setFilteredDataSource] = useState([]);
+  const [masterDataSource, setMasterDataSource] = useState([]);
+  const [listFriends, setListFriends] = useState([])
+  const [listChats, setListChats] = useState([])
+  const [listRooms, setListRooms] = useState([])
+  const navigation = useNavigation()
+  const [isBusy, setIsBusy] = useState(true)
+  
+    const searchFilterFunction = (text) => {
+      if (text) {
+        const newData = listRooms.filter(function (item) {
+          const itemData = item.name ? item.name.toUpperCase() : ''.toUpperCase();
+          const textData = text.toUpperCase();
+          return itemData.indexOf(textData) > -1;
+        });
+        setFilteredDataSource(newData);
+        setSearch(text);
+      } else {
+        setFilteredDataSource([]);
+        setSearch(text);
+      }
+    };
+  const ItemView = ({item}) => {
+      /*let userInfo;
+      if (!globalContext.chatRooms && !globalContext.isBusy) {
+        console.log("Waiting ...")
+      }
+      else {
+        userInfo = globalContext.masterData.find(element => element.uid == item.lastmessage.sentBy || element.uid == item.lastmessage.sendTo)
+        //console.log(userInfo)
+      }*/
+      return (
+        <>
+          {!globalContext.chatRooms && !globalContext.masterDataIsOnGetting ?  (<></>) : (<>
+            <TouchableOpacity onPress={() => {navigation.navigate('chatingroup', {group_item: item, users: globalContext.masterData})}}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems:'center',
+            marginBottom: 15,
+          }}>
+            <View style={{width: 55}}>
+            <FriendsAvatar
+              Img={item.avatar}
+              Width={55}
+              Height={55}
+              Type={true}
+            />
+            </View>
+            <View style={{marginLeft: 15, marginRight: 5, flex: 1}}>
+              <View style={{
+                  justifyContent:'space-between', 
+                  flexDirection: 'row',                    
+                }}>
+                  <Text  style={{fontWeight: 'bold', fontSize: 18, textAlign:'center'}}>
+                    {item.name} 
+                  </Text >
+                  <View style={{justifyContent:'center'}}>
+                  <Text >
+                    {new Date(item.lastmessage.createdAt.toDate()).toLocaleDateString()}
+                  </Text>
+                  </View>
+              </View>
+              <View>
+              <View style={{
+                  justifyContent:'space-between', 
+                  flexDirection: 'row',      
+                }}>
+              <Text style={{
+                fontWeight: !item.seen && item.lastmessage.sendTo === auth.currentUser.uid ? 'bold' : 'normal'
+              }}>
+                {item.lastmessage.system ? (<>{item.lastmessage.text}</>):(<>
+                  {item.lastmessage.sentBy != auth.currentUser.uid ? null : "Bạn: "}{item.lastmessage.type === "text" ? item.lastmessage.text : (<>
+                  {item.lastmessage.type === "video" ? "Video" : (<>
+                    {item.lastmessage.type === "image" ? "Hình ảnh" : <>
+                      {item.lastmessage.type === "document" ? "Đã gửi một tệp đính kèm" : (<>
+                        {item.lastmessage.type === "audio" ? "Đã gửi một clip thoại" : (<>
+                          {item.lastmessage.type === "gif" ? "GIF" : <></>}</>)}
+                      </>)}</>}
+                  </>)}
+                </>)} 
+                </>)}
+              </Text>
+               
+              </View>
+              </View>
+            </View>
+          </View>
+          </TouchableOpacity>
+          </>)}
+        </>
+      );
+  };
+  const getItem = (item) => {
+   alert(item.uid)
+  };
+  return (
+        <>
+          <View style={{backgroundColor: 'white', height: "100%", padding: 5}}>
+              <SearchBar 
+              round 
+              onChangeText={(text) => searchFilterFunction(text)}
+              onClear={(text) => searchFilterFunction('')}
+              searchIcon={{ size: 24, color: 'black'}}
+              containerStyle={{
+                  backgroundColor: 'transparent',
+                  borderTopWidth: 0,
+                  borderBottomWidth: 0,
+              }}
+              inputStyle={{
+                  backgroundColor:"#EEEEEE"
+              }}
+              inputContainerStyle={{
+                  backgroundColor:"#EEEEEE"
+              }}
+              placeholder="Tìm kiếm"
+              placeholderTextColor={"#B2B1B9"}
+              value={search}
+          >
+          </SearchBar>
+          <KeyboardAvoidingView>
+          <FlatList
+              data={globalContext.listGroupChat}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={ItemView}  
+              showsHorizontalScrollIndicator={false}  
+              showsVerticalScrollIndicator={false}
+              style={{marginBottom: 85, padding: 10}}
+          >
+          </FlatList>
+          </KeyboardAvoidingView>
+      </View>
+      {!globalContext.isPending ?  null : <AppLoadingAnimation />}
+      </>
+  )
 }

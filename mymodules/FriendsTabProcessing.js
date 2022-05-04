@@ -1,8 +1,9 @@
 
 import { auth } from "../firebase";
-import { doc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, setDoc} from "firebase/firestore";
+import { doc, updateDoc, arrayUnion, arrayRemove, addDoc, collection, setDoc, serverTimestamp} from "firebase/firestore";
 
 import { db } from "../firebase";
+import { nanoid } from "nanoid";
 export async function sendingMyRequest(item) {
     Promise.all([
       updateDoc(doc(db, "users", item.uid), {
@@ -22,14 +23,27 @@ export async function acceptRequest(item){
         listfriends: arrayUnion(auth.currentUser.uid)
       })
     ])
+    const message = {
+      _id: nanoid(),
+      text: 'Các bạn đang kết nối trên Exping',
+      system: true,
+      createdAt: new Date(),
+      sendTo: item.uid,
+      sentBy: auth.currentUser.uid
+    }
     const docid = item.uid > auth.currentUser.uid ? auth.currentUser.uid + "-" + item.uid : item.uid + "-" + auth.currentUser.uid
     setDoc(doc(db, 'chatrooms', docid),{
       draf: [],
-      users: item.uid > auth.currentUser.uid ? [auth.currentUser.uid, item.uid] : [item.uid, auth.currentUser.uid]
+      lastmessage: {
+        ...message
+      },
+      //users: item.uid > auth.currentUser.uid ? [auth.currentUser.uid, item.uid] : [item.uid, auth.currentUser.uid],
+      participants: [auth.currentUser.uid, item.uid]
     })
     const colRef = collection(doc(db, 'chatrooms', docid), "messages");
     addDoc(colRef, {
-      Initmessages: [],
+      //Initmessages: [],
+      ...message
     })
     const colRef2 = collection(doc(db, 'chatrooms', docid), "videocall");
     addDoc(colRef2, {
